@@ -17,8 +17,16 @@ logs
 .DS_Store
 .fleet
 .idea
+.vscode
 
 # Local env files
 .env
 .env.*
 !.env.example
+
+# Template
+template
+
+# Claude Code local settings (user-specific permissions)
+.claude/settings.json
+.claude/settings.local.json
