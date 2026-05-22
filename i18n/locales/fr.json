@@ -1,0 +1,80 @@
+{
+  "common": {
+    "subtitle": "DEVELOPPEUR FULL-STACK",
+    "status": "Disponible · Mai 2026",
+    "footTag": "Cotonou · Disponible en remote · UTC+1",
+    "footBuilt": "Crafted in Nuxt",
+    "footCopy": "© 2026 Norris Akogbede · Tous droits réservés"
+  },
+  "nav": {
+    "home": "Accueil",
+    "projects": "Projets",
+    "blog": "Blog",
+    "contact": "Contact"
+  },
+  "home": {
+    "headlineA": "Je transforme vos problèmes métier en",
+    "headlineB": "outils digitaux",
+    "headlineC": "qui rapportent.",
+    "lede": "Développeur web & mobile freelance. Nuxt.js, NestJS, React Native — et Solidity pour les projets Web3.",
+    "ctaPrimary": "Discutons de votre projet",
+    "ctaSecondary": "Voir mes projets",
+    "trust0": "4+ ans d'expérience",
+    "trust1": "Web2 & Web3",
+    "trust2": "Disponible pour mission"
+  },
+  "about": {
+    "label": "À propos",
+    "heading": "Pas un développeur. Un partenaire technique pour votre business.",
+    "p1": "Je résous des problèmes business avec du code — pas l'inverse. Quand vous m'expliquez votre situation, je cherche d'abord le levier économique, ensuite la solution technique.",
+    "p2": "Plus de 4 ans à construire des plateformes web, applications mobiles, outils internes et APIs pour des PME et des startups, du MVP au produit en production.",
+    "p3": "Double compétence: Web2 comme stack principal (Nuxt, NestJS, React Native) et Web3 quand le projet l'exige réellement — smart contracts Solidity, intégrations on-chain, tokenomics.",
+    "pull": "Le vrai problème n'est presque jamais technique.",
+    "statsExpLabel": "EXPÉRIENCE",
+    "statsExpDesc": "ans d'expérience",
+    "statsDelivLabel": "LIVRAISONS",
+    "statsDelivDesc": "projets livrés",
+    "statsRefLabel": "RECOMMANDÉ",
+    "statsRefDesc": "des projets recommandés",
+    "cvLabel": "CURRICULUM VITAE",
+    "cvTitle": "Télécharger mon CV",
+    "cvSize": "PDF · 240 KB",
+    "stackPrimaryLabel": "STACK PRINCIPAL",
+    "stackWeb3Label": "WEB3 — SUR DEMANDE"
+  },
+  "projects": {
+    "sectionLabel": "02 — Projets récents",
+    "sectionHeading": "Quelques projets récents",
+    "sectionSubtitle": "Trois missions où la tech a servi un objectif business concret. Cliquez pour lire l'étude de cas.",
+    "seeAll": "Voir tous les projets",
+    "pageLabel": "Projets",
+    "pageHeading": "Études de cas et missions livrées.",
+    "pageSubtitle": "Une sélection de missions Web2 et Web3, de la définition du besoin business jusqu'à la mise en production. Cliquez pour lire le détail de chaque projet.",
+    "readCase": "Lire l'étude de cas",
+    "pageCta": "Discutons de votre projet"
+  },
+  "blog": {
+    "sectionLabel": "03 — Notes récentes",
+    "sectionHeading": "Réflexions et notes de terrain",
+    "sectionSubtitle": "Sur le développement, le freelance et la résolution de problèmes business par la tech.",
+    "seeAll": "Tous les articles",
+    "pageLabel": "Journal",
+    "pageHeading": "Réflexions, notes et retours d'expérience.",
+    "pageSubtitle": "Des textes courts ou longs sur la tech, le freelance, et la manière de transformer un problème business en livrable digital. Mis à jour ~2 fois par mois.",
+    "filterAll": "TOUS",
+    "backHome": "Retour à l'accueil"
+  },
+  "contact": {
+    "label": "Contact",
+    "heading": "Vous avez un projet en tête ?",
+    "subtitle": "Une conversation de 30 minutes pour comprendre votre situation. Sans engagement.",
+    "formName": "Nom",
+    "formNamePlaceholder": "Marie Dupont",
+    "formEmail": "Email",
+    "formEmailPlaceholder": "marie{'@'}entreprise.com",
+    "formMessage": "Décrivez votre projet en quelques lignes",
+    "formMessagePlaceholder": "On cherche à digitaliser notre processus de…",
+    "submit": "Envoyer",
+    "directLabel": "OU DIRECTEMENT"
+  }
+}

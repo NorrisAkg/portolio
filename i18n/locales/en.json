@@ -1,0 +1,80 @@
+{
+  "common": {
+    "subtitle": "FULL-STACK DEVELOPER",
+    "status": "Available · May 2026",
+    "footTag": "Cotonou · Remote-ready · UTC+1",
+    "footBuilt": "Crafted in Nuxt",
+    "footCopy": "© 2026 Norris Akogbede · All rights reserved"
+  },
+  "nav": {
+    "home": "Home",
+    "projects": "Projects",
+    "blog": "Blog",
+    "contact": "Contact"
+  },
+  "home": {
+    "headlineA": "I turn your business problems into",
+    "headlineB": "digital tools",
+    "headlineC": "that pay off.",
+    "lede": "Freelance web & mobile developer. Nuxt.js, NestJS, React Native — and Solidity for Web3 projects.",
+    "ctaPrimary": "Let's talk about your project",
+    "ctaSecondary": "See my work",
+    "trust0": "4+ years of experience",
+    "trust1": "Web2 & Web3",
+    "trust2": "Available for a mission"
+  },
+  "about": {
+    "label": "About",
+    "heading": "Not a developer. A technical partner for your business.",
+    "p1": "I solve business problems with code — not the other way around. When you describe your situation, I look for the economic lever first, the technical solution second.",
+    "p2": "4+ years building web platforms, mobile apps, internal tools and APIs for SMEs and startups, from MVP to production.",
+    "p3": "Dual stack: Web2 as primary (Nuxt, NestJS, React Native) and Web3 when the project genuinely calls for it — Solidity smart contracts, on-chain integrations, tokenomics.",
+    "pull": "The real problem is almost never technical.",
+    "statsExpLabel": "EXPERIENCE",
+    "statsExpDesc": "years experience",
+    "statsDelivLabel": "DELIVERED",
+    "statsDelivDesc": "projects shipped",
+    "statsRefLabel": "REFERRALS",
+    "statsRefDesc": "of projects come from referrals",
+    "cvLabel": "RESUME",
+    "cvTitle": "Download my résumé",
+    "cvSize": "PDF · 240 KB",
+    "stackPrimaryLabel": "MAIN STACK",
+    "stackWeb3Label": "WEB3 — ON DEMAND"
+  },
+  "projects": {
+    "sectionLabel": "Recent work",
+    "sectionHeading": "A few recent projects",
+    "sectionSubtitle": "Three missions where tech served a concrete business goal. Click to read the case study.",
+    "seeAll": "See all projects",
+    "pageLabel": "Projects",
+    "pageHeading": "Case studies and shipped missions.",
+    "pageSubtitle": "A selection of Web2 and Web3 missions, from defining the business need to shipping to production. Click to read each project in detail.",
+    "readCase": "Read the case study",
+    "pageCta": "Let's talk about your project"
+  },
+  "blog": {
+    "sectionLabel": "Recent notes",
+    "sectionHeading": "Thoughts and field notes",
+    "sectionSubtitle": "On development, freelancing and solving business problems with tech.",
+    "seeAll": "All articles",
+    "pageLabel": "Journal",
+    "pageHeading": "Thoughts, notes and field reports.",
+    "pageSubtitle": "Short and long pieces on tech, freelancing, and turning a business problem into a digital deliverable. Updated ~twice a month.",
+    "filterAll": "ALL",
+    "backHome": "Back to home"
+  },
+  "contact": {
+    "label": "Contact",
+    "heading": "Have a project in mind?",
+    "subtitle": "A 30-minute conversation to understand your situation. No strings.",
+    "formName": "Name",
+    "formNamePlaceholder": "Marie Dupont",
+    "formEmail": "Email",
+    "formEmailPlaceholder": "marie{'@'}company.com",
+    "formMessage": "Describe your project in a few lines",
+    "formMessagePlaceholder": "We want to digitalise our…",
+    "submit": "Send",
+    "directLabel": "OR DIRECTLY"
+  }
+}
