@@ -64,6 +64,22 @@
     "filterAll": "TOUS",
     "backHome": "Retour à l'accueil"
   },
+  "article": {
+    "label": "Article",
+    "toc": "Sommaire",
+    "progress": "Progression",
+    "authorRoleLabel": "AUTEUR",
+    "authorRole": "Développeur freelance · Cotonou",
+    "authorBio": "Norris transforme des problèmes business en outils digitaux qui rapportent. Web2 & Web3, du MVP à la production. Disponible pour discuter de votre projet.",
+    "authorCta": "Discutons",
+    "updated": "Mis à jour le ",
+    "share": "Partager",
+    "related": "À lire aussi",
+    "allJournal": "Voir tout le journal",
+    "prev": "Article précédent",
+    "next": "Article suivant",
+    "coverStamp": "COVER"
+  },
   "contact": {
     "label": "Contact",
     "heading": "Vous avez un projet en tête ?",

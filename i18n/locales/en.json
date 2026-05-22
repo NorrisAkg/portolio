@@ -64,6 +64,22 @@
     "filterAll": "ALL",
     "backHome": "Back to home"
   },
+  "article": {
+    "label": "Article",
+    "toc": "Contents",
+    "progress": "Progress",
+    "authorRoleLabel": "AUTHOR",
+    "authorRole": "Freelance developer · Cotonou",
+    "authorBio": "Norris turns business problems into digital tools that pay off. Web2 & Web3, MVP to production. Available to talk about your project.",
+    "authorCta": "Let's talk",
+    "updated": "Updated ",
+    "share": "Share",
+    "related": "Keep reading",
+    "allJournal": "See all the journal",
+    "prev": "Previous article",
+    "next": "Next article",
+    "coverStamp": "COVER"
+  },
   "contact": {
     "label": "Contact",
     "heading": "Have a project in mind?",
