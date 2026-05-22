@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { listArticles, type Locale } from '~/utils/articles'
+
+const { locale } = useI18n()
 const localePath = useLocalePath()
 
 // TODO: replace with useFetch('/api/projects?featured=true') in Phase 3
@@ -24,11 +27,7 @@ const projects = [
 ]
 
 // TODO: replace with useFetch('/api/articles?limit=3') in Phase 3
-const blogPosts = [
-  { tag: 'STRATEGY', title: "Why your MVP doesn't need blockchain", excerpt: "Most Web3 projects I turn down could ship with a database and a PDF.", date: 'April 12, 2026', read: '6 min' },
-  { tag: 'TECH', title: 'Nuxt 3 + NestJS: the combo I recommend to SMEs', excerpt: "One language, one ecosystem, a velocity few stacks match at this level of maturity.", date: 'March 28, 2026', read: '9 min' },
-  { tag: 'FREELANCE', title: 'The ideal client brief (and how to get it)', excerpt: "Three questions I ask before every quote to clear up 80% of misunderstandings.", date: 'March 5, 2026', read: '4 min' },
-]
+const blogPosts = computed(() => listArticles(locale.value as Locale).slice(0, 3))
 </script>
 
 <template>
@@ -177,10 +176,11 @@ const blogPosts = [
         <p class="blog-sub">{{ $t('blog.sectionSubtitle') }}</p>
       </AppReveal>
       <div class="blog-grid">
-        <AppReveal v-for="(b, i) in blogPosts" :key="i" :delay="i * 60">
+        <AppReveal v-for="(b, i) in blogPosts" :key="b.slug" :delay="i * 60">
           <BlogCard
-:tag="b.tag" :title="b.title" :excerpt="b.excerpt" :date="b.date" :read="b.read"
-            :to="localePath('/blog')" />
+            :tag="b.tag" :title="b.title" :excerpt="b.excerpt" :date="b.date" :read="b.read"
+            :to="localePath(`/blog/${b.slug}`)"
+          />
         </AppReveal>
       </div>
       <AppReveal>
