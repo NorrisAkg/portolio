@@ -35,7 +35,7 @@ const blogPosts = computed(() => listArticles(locale.value as Locale).slice(0, 3
 
     <!-- HERO -->
     <section id="home" class="section hero-v2">
-      <div class="hero-text">
+      <div class="hero-heading">
         <AppReveal>
           <h1 class="headline">
             {{ $t('home.headlineA') }} <em>{{ $t('home.headlineB') }}</em> {{ $t('home.headlineC') }}
@@ -44,6 +44,11 @@ const blogPosts = computed(() => listArticles(locale.value as Locale).slice(0, 3
         <AppReveal :delay="80">
           <p class="lede">{{ $t('home.lede') }}</p>
         </AppReveal>
+      </div>
+      <AppReveal class="hero-portrait-slot" :delay="120">
+        <HeroPortrait />
+      </AppReveal>
+      <div class="hero-actions">
         <AppReveal :delay="140">
           <div class="cta-row">
             <a href="#contact" class="btn btn-primary">
@@ -56,22 +61,18 @@ const blogPosts = computed(() => listArticles(locale.value as Locale).slice(0, 3
             </NuxtLink>
           </div>
           <div class="trust">
-            <template v-for="(_, i) in 3" :key="i">
-              <span v-if="i > 0" class="sep" />
-              <span>{{ $t(`home.trust${i}`) }}</span>
-            </template>
+            <span v-for="(_, i) in 3" :key="i" class="trust-pill">
+              {{ $t(`home.trust${i}`) }}
+            </span>
           </div>
         </AppReveal>
       </div>
-      <AppReveal :delay="120">
-        <HeroPortrait />
-      </AppReveal>
     </section>
 
     <!-- ABOUT -->
     <section id="about" class="section">
       <div class="section-label">
-        <span>{{ $t('about.label') }}</span>
+        <span><span class="sec-num">02</span> — {{ $t('about.label') }}</span>
         <span class="rule" />
       </div>
       <AppReveal>
@@ -141,7 +142,7 @@ const blogPosts = computed(() => listArticles(locale.value as Locale).slice(0, 3
     <!-- PROJECTS — first 3 -->
     <section id="projects" class="section">
       <div class="section-label">
-        <span>{{ $t('projects.sectionLabel') }}</span>
+        <span><span class="sec-num">03</span> — {{ $t('projects.sectionLabel') }}</span>
         <span class="rule" />
       </div>
       <AppReveal>
@@ -151,7 +152,7 @@ const blogPosts = computed(() => listArticles(locale.value as Locale).slice(0, 3
       <div class="projects">
         <AppReveal v-for="(p, i) in projects" :key="i" :delay="i * 60">
           <ProjectCard
-:name="p.name" :year="p.year" :dur="p.dur" :problem="p.problem" :bullets="p.bullets"
+            :name="p.name" :year="p.year" :dur="p.dur" :problem="p.problem" :bullets="p.bullets"
             :tone="p.tone" :label="p.label" :reverse="i % 2 === 1" :read-case-label="$t('projects.readCase')"
             :to="localePath('/projects')" />
         </AppReveal>
@@ -168,7 +169,7 @@ const blogPosts = computed(() => listArticles(locale.value as Locale).slice(0, 3
     <!-- BLOG — first 3 -->
     <section id="blog" class="section">
       <div class="section-label">
-        <span>{{ $t('blog.sectionLabel') }}</span>
+        <span><span class="sec-num">04</span> — {{ $t('blog.sectionLabel') }}</span>
         <span class="rule" />
       </div>
       <AppReveal>
@@ -179,8 +180,7 @@ const blogPosts = computed(() => listArticles(locale.value as Locale).slice(0, 3
         <AppReveal v-for="(b, i) in blogPosts" :key="b.slug" :delay="i * 60">
           <BlogCard
             :tag="b.tag" :title="b.title" :excerpt="b.excerpt" :date="b.date" :read="b.read"
-            :to="localePath(`/blog/${b.slug}`)"
-          />
+            :to="localePath(`/blog/${b.slug}`)" />
         </AppReveal>
       </div>
       <AppReveal>

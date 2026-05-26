@@ -25,7 +25,7 @@ const handleSubmit = async (e: Event) => {
     <span class="watermark">N.A.</span>
     <div class="contact-inner">
       <div class="section-label">
-        <span>{{ $t('contact.label') }}</span>
+        <span><span class="sec-num">05</span> — {{ $t('contact.label') }}</span>
         <span class="rule" />
       </div>
       <AppReveal>

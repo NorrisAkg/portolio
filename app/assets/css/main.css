@@ -106,6 +106,12 @@ img { max-width: 100%; display: block; }
   margin-bottom: 28px;
 }
 .section-label .rule { flex: 1; height: 1px; background: var(--border); max-width: 240px; }
+.sec-num {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--orange);
+  font-size: 10px; letter-spacing: 0.12em; font-weight: 500;
+  margin-right: 4px;
+}
 
 /* ─── Hero ──────────────────────────────────────────────── */
 h1.headline {
@@ -139,8 +145,16 @@ html.dark .btn-primary { color: #0A0F1A; }
 .btn-secondary:hover { background: var(--navy); color: #fff; }
 html.dark .btn-secondary:hover { color: #0A0F1A; }
 
-.trust { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; font-size: 14px; color: var(--muted); }
-.trust .sep { width: 3px; height: 3px; border-radius: 50%; background: var(--muted); opacity: .5; }
+.trust { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.trust-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1px solid var(--border); border-radius: 999px;
+  padding: 6px 10px; font-size: 11px; color: var(--muted); line-height: 1;
+}
+.trust-pill::before {
+  content: ""; width: 5px; height: 5px; border-radius: 50%;
+  background: var(--orange); flex-shrink: 0;
+}
 
 .see-more {
   display: inline-flex; align-items: center; gap: 8px;
@@ -157,14 +171,21 @@ html.dark .btn-secondary:hover { color: #0A0F1A; }
 .hero-v2 {
   display: grid;
   grid-template-columns: 1.1fr 1fr;
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    "heading portrait"
+    "actions portrait";
   gap: 64px;
-  align-items: center;
+  align-items: start;
   padding-top: 88px;
   padding-bottom: 96px;
   border-top: none !important;
 }
-.hero-v2 .hero-text h1.headline { font-size: 60px; max-width: 14ch; }
-.hero-v2 .hero-text .lede { max-width: 38ch; }
+.hero-v2 .hero-heading        { grid-area: heading; }
+.hero-v2 .hero-portrait-slot  { grid-area: portrait; align-self: center; }
+.hero-v2 .hero-actions        { grid-area: actions; }
+.hero-v2 .hero-heading h1.headline { font-size: 60px; max-width: 14ch; }
+.hero-v2 .hero-heading .lede { max-width: 38ch; }
 
 .hero-portrait {
   position: relative;
@@ -950,7 +971,7 @@ html.dark .art-author-card .cta { color: #0A0F1A; }
   .foot-rich .foot-inner,
   .hdr-inner { padding: 0 32px; }
   .hero-v2 { gap: 40px; padding-top: 64px; padding-bottom: 72px; }
-  .hero-v2 .hero-text h1.headline { font-size: 48px; }
+  .hero-v2 .hero-heading h1.headline { font-size: 48px; }
   .page-top h1.page-h { font-size: 40px; }
   .foot-rich .grid { grid-template-columns: 1fr 1fr; gap: 40px; }
 
@@ -974,22 +995,29 @@ html.dark .art-author-card .cta { color: #0A0F1A; }
   .foot-rich .foot-inner,
   .hdr-inner { padding: 0 20px; }
 
-  /* Hero — .app.v2.mobile values */
-  .hero-v2 { grid-template-columns: 1fr; gap: 32px; padding-top: 32px; padding-bottom: 48px; }
-  .hero-v2 .hero-text { order: 2; }
-  .hero-portrait { order: 1; max-width: 240px; justify-self: start; }
-  .hero-v2 .hero-text h1.headline { font-size: 36px; }
+  /* Hero — flex column : portrait → heading → actions */
+  .hero-v2 { display: flex; flex-direction: column; gap: 24px; padding-top: 32px; padding-bottom: 48px; }
+  .hero-v2 .hero-portrait-slot  { order: 1; }
+  .hero-v2 .hero-portrait-slot .hero-portrait { max-width: 240px; }
+  .hero-v2 .hero-heading        { order: 2; }
+  .hero-v2 .hero-actions        { order: 3; }
+  .hero-v2 .hero-heading h1.headline { font-size: 36px; }
 
   /* Page heads */
   .page-top h1.page-h { font-size: 32px; }
 
-  /* Sections */
-  .section { padding: 40px 0 56px; }
-  .about-grid { grid-template-columns: 1fr; gap: 32px; }
+  /* Sections — .app.v2 scoped pour battre la spécificité desktop (0,2,0 vs 0,1,0) */
+  .section, .app.v2 .section { padding: 40px 0 56px; }
+  .about-grid, .app.v2 .about-grid { grid-template-columns: 1fr; gap: 32px; }
+
+  /* About — stats en grille 3 colonnes, cv + stack pleine largeur */
+  .aside-stack { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .cv-card, .stack-block { grid-column: 1 / -1; }
+  .aside-card .val { font-size: 22px; }
 
   /* Projects */
-  .project { grid-template-columns: 1fr; gap: 20px; direction: ltr; }
-  .project.reverse { direction: ltr; }
+  .project, .app.v2 .project { grid-template-columns: 1fr; gap: 20px; direction: ltr; }
+  .project.reverse, .app.v2 .project.reverse { direction: ltr; }
   .proj-image { order: -1; }
 
   /* Blog */
