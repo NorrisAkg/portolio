@@ -1,4 +1,21 @@
-// Manual DI container — will be filled as modules are added
-export const container = {} as const
+/**
+ * Simple DI Container
+ */
+export class Container {
+  private dependencies = new Map<string, any>();
 
-export type Container = typeof container
+  register<T>(name: string, dependency: T): void {
+    this.dependencies.set(name, dependency);
+  }
+
+  resolve<T>(name: string): T {
+    const dependency = this.dependencies.get(name);
+    if (!dependency) {
+      throw new Error(`Dependency ${name} not found in container`);
+    }
+    return dependency as T;
+  }
+}
+
+// Global instance for the application
+export const container = new Container();

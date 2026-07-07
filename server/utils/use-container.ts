@@ -1,3 +1,5 @@
-import { container } from '~~/server/shared/container'
+import { container, Container } from '../shared/container';
 
-export const useContainer = () => container
+export function useContainer(): Container {
+  return container;
+}
