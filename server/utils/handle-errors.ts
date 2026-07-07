@@ -1,12 +1,20 @@
-import { DomainError } from '~~/server/shared/errors/domain.error'
+import { DomainError } from '../shared/errors/domain.error';
+import { H3Event } from 'h3';
 
-export const handleDomainError = (error: unknown): never => {
+export function handleDomainError(error: unknown) {
   if (error instanceof DomainError) {
     throw createError({
       statusCode: error.httpStatus,
-      statusMessage: error.code,
-      message: error.message,
-    })
+      statusMessage: error.message,
+      data: {
+        code: error.code,
+      },
+    });
   }
-  throw error
+
+  console.error('[Unhandled Error]', error);
+  throw createError({
+    statusCode: 500,
+    statusMessage: 'Internal Server Error',
+  });
 }
