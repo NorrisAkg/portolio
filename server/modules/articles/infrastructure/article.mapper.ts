@@ -1,6 +1,8 @@
-import { Article as PrismaArticle } from '@prisma/client';
-import { Article, ArticleStatus } from '../domain/article.entity';
+import type { Article as PrismaArticle } from '@prisma/client';
+import type { ArticleStatus } from '../domain/article.entity';
+import { Article } from '../domain/article.entity';
 
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class ArticleMapper {
   static toDomain(prismaArticle: PrismaArticle): Article {
     return Article.create({

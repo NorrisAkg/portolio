@@ -1,6 +1,6 @@
-import { PrismaClient } from '@prisma/client';
-import { ArticleRepository, FindAllParams, PaginatedResult } from '../domain/article.repository';
-import { Article } from '../domain/article.entity';
+import type { PrismaClient } from '@prisma/client';
+import type { ArticleRepository, FindAllParams, PaginatedResult } from '../domain/article.repository';
+import type { Article } from '../domain/article.entity';
 import { ArticleMapper } from './article.mapper';
 
 export class PrismaArticleRepository implements ArticleRepository {

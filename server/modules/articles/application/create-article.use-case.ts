@@ -1,4 +1,4 @@
-import { ArticleRepository } from '../domain/article.repository';
+import type { ArticleRepository } from '../domain/article.repository';
 import { Article } from '../domain/article.entity';
 import { randomUUID } from 'crypto';
 

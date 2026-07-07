@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { DeleteArticleUseCase } from '../../modules/articles/application/delete-article.use-case';
+import type { DeleteArticleUseCase } from '../../modules/articles/application/delete-article.use-case';
 import { handleDomainError } from '../../utils/handle-errors';
 import { useContainer } from '../../utils/use-container';
 
@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
     return null;
   } catch (error) {
     if (error instanceof z.ZodError) {
-      throw createError({ statusCode: 400, statusMessage: 'Bad Request', data: error.errors });
+      throw createError({ statusCode: 400, statusMessage: 'Bad Request', data: error.issues });
     }
     handleDomainError(error);
   }

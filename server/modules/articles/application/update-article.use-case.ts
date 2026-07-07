@@ -1,5 +1,5 @@
-import { ArticleRepository } from '../domain/article.repository';
-import { Article } from '../domain/article.entity';
+import type { ArticleRepository } from '../domain/article.repository';
+import type { Article } from '../domain/article.entity';
 import { ArticleNotFoundError } from '../domain/article.errors';
 
 export interface UpdateArticleInput {

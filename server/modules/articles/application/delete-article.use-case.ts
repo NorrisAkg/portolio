@@ -1,4 +1,4 @@
-import { ArticleRepository } from '../domain/article.repository';
+import type { ArticleRepository } from '../domain/article.repository';
 import { ArticleNotFoundError } from '../domain/article.errors';
 
 export interface DeleteArticleInput {

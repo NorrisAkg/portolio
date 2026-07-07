@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { PublishArticleUseCase } from '../../modules/articles/application/publish-article.use-case';
-import { handleDomainError } from '../../utils/handle-errors';
-import { useContainer } from '../../utils/use-container';
+import type { PublishArticleUseCase } from '../../../modules/articles/application/publish-article.use-case';
+import { handleDomainError } from '../../../utils/handle-errors';
+import { useContainer } from '../../../utils/use-container';
 
 const paramsSchema = z.object({
   id: z.string().uuid(),
@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
     return article.toJSON();
   } catch (error) {
     if (error instanceof z.ZodError) {
-      throw createError({ statusCode: 400, statusMessage: 'Bad Request', data: error.errors });
+      throw createError({ statusCode: 400, statusMessage: 'Bad Request', data: error.issues });
     }
     handleDomainError(error);
   }

@@ -1,5 +1,4 @@
 import { DomainError } from '../shared/errors/domain.error';
-import { H3Event } from 'h3';
 
 export function handleDomainError(error: unknown) {
   if (error instanceof DomainError) {

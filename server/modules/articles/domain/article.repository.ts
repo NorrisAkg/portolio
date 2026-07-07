@@ -1,4 +1,4 @@
-import { Article } from './article.entity';
+import type { Article } from './article.entity';
 
 export interface FindAllParams {
   page: number;

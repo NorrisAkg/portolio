@@ -1,5 +1,5 @@
-import { ArticleRepository, PaginatedResult } from '../domain/article.repository';
-import { Article } from '../domain/article.entity';
+import type { ArticleRepository, PaginatedResult } from '../domain/article.repository';
+import type { Article } from '../domain/article.entity';
 
 export interface ListArticlesInput {
   page: number;
