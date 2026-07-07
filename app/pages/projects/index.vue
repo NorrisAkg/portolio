@@ -41,19 +41,19 @@ const projects = [
 </script>
 
 <template>
-  <div class="content">
-    <header class="page-top">
-      <div class="section-label">
+  <div class="max-w-[1120px] mx-auto px-12 max-lg:px-8 max-sm:px-5">
+    <header class="pt-14">
+      <div class="flex items-center gap-4 text-[11px] tracking-[0.18em] uppercase text-muted font-medium mb-7">
         <span>{{ $t('projects.pageLabel') }}</span>
-        <span class="rule" />
+        <span class="flex-1 h-px bg-border max-w-[240px]" />
       </div>
       <AppReveal>
-        <h1 class="page-h">{{ $t('projects.pageHeading') }}</h1>
-        <p class="page-sub">{{ $t('projects.pageSubtitle') }}</p>
+        <h1 class="font-['Montserrat'] font-bold text-[48px] leading-[1.1] text-navy dark:text-[#E8ECF5] m-0 mb-4 tracking-[-0.02em] max-w-[18ch] max-lg:text-[40px] max-sm:text-[32px]">{{ $t('projects.pageHeading') }}</h1>
+        <p class="text-[18px] text-muted max-w-[55ch] m-0 mb-12 leading-[1.55]">{{ $t('projects.pageSubtitle') }}</p>
       </AppReveal>
     </header>
 
-    <div class="projects-page">
+    <div class="flex flex-col gap-16 pb-16">
       <AppReveal v-for="(p, i) in projects" :key="i" :delay="(i % 3) * 60">
         <ProjectCard
           :name="p.name"

@@ -22,7 +22,10 @@ const blockBg = computed(() => props.tone === 'navy' ? '#1E2638' : '#F7F8FA')
 </script>
 
 <template>
-  <div class="proj-image" :style="{ background: bg }">
+  <div
+    class="aspect-[4/3] rounded-[14px] overflow-hidden border border-border relative"
+    :style="{ background: bg }"
+  >
     <svg viewBox="0 0 400 300" preserveAspectRatio="none" width="100%" height="100%">
       <defs>
         <pattern
@@ -47,6 +50,6 @@ const blockBg = computed(() => props.tone === 'navy' ? '#1E2638' : '#F7F8FA')
       <rect x="222" y="200" width="46" height="6" rx="2" :fill="accent" />
       <rect x="222" y="214" width="80" height="5" rx="2" :fill="stripe" opacity=".4" />
     </svg>
-    <span class="label">{{ label }}</span>
+    <span class="absolute left-3.5 bottom-3 font-['JetBrains_Mono'] text-[10px] text-muted uppercase tracking-[0.1em]">{{ label }}</span>
   </div>
 </template>
