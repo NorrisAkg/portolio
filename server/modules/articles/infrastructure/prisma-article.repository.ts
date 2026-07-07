@@ -9,19 +9,25 @@ export class PrismaArticleRepository implements ArticleRepository {
   async findById(id: string): Promise<Article | null> {
     const prismaArticle = await this.prisma.article.findUnique({
       where: { id },
+      include: { translations: true },
     });
 
     if (!prismaArticle) return null;
-    return ArticleMapper.toDomain(prismaArticle);
+    return ArticleMapper.toDomain(prismaArticle as any);
   }
 
   async findBySlug(slug: string): Promise<Article | null> {
-    const prismaArticle = await this.prisma.article.findUnique({
-      where: { slug },
+    const prismaArticle = await this.prisma.article.findFirst({
+      where: {
+        translations: {
+          some: { slug },
+        },
+      },
+      include: { translations: true },
     });
 
     if (!prismaArticle) return null;
-    return ArticleMapper.toDomain(prismaArticle);
+    return ArticleMapper.toDomain(prismaArticle as any);
   }
 
   async findAll(params: FindAllParams): Promise<PaginatedResult<Article>> {
@@ -36,12 +42,13 @@ export class PrismaArticleRepository implements ArticleRepository {
         where,
         skip,
         take: limit,
+        include: { translations: true },
         orderBy: { createdAt: 'desc' },
       }),
     ]);
 
     return {
-      data: prismaArticles.map(ArticleMapper.toDomain),
+      data: prismaArticles.map(a => ArticleMapper.toDomain(a as any)),
       meta: {
         total,
         page,
@@ -52,12 +59,56 @@ export class PrismaArticleRepository implements ArticleRepository {
   }
 
   async save(article: Article): Promise<void> {
-    const prismaArticle = ArticleMapper.toPrisma(article);
-    
+    const props = article.toJSON();
+
     await this.prisma.article.upsert({
-      where: { id: prismaArticle.id },
-      update: prismaArticle,
-      create: prismaArticle,
+      where: { id: props.id },
+      update: {
+        image: props.image,
+        status: props.status,
+        publishedAt: props.publishedAt,
+        updatedAt: new Date(),
+        translations: {
+          upsert: props.translations.map(t => ({
+            where: {
+              articleId_locale: {
+                articleId: props.id,
+                locale: t.locale,
+              },
+            },
+            update: {
+              title: t.title,
+              slug: t.slug,
+              description: t.description,
+              content: t.content,
+            },
+            create: {
+              locale: t.locale,
+              title: t.title,
+              slug: t.slug,
+              description: t.description,
+              content: t.content,
+            },
+          })),
+        },
+      },
+      create: {
+        id: props.id,
+        image: props.image,
+        status: props.status,
+        publishedAt: props.publishedAt,
+        createdAt: props.createdAt,
+        updatedAt: props.updatedAt,
+        translations: {
+          create: props.translations.map(t => ({
+            locale: t.locale,
+            title: t.title,
+            slug: t.slug,
+            description: t.description,
+            content: t.content,
+          })),
+        },
+      },
     });
   }
 

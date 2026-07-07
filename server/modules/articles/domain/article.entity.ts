@@ -2,17 +2,22 @@ import { ArticleAlreadyPublishedError, InvalidArticleStatusError } from './artic
 
 export type ArticleStatus = 'DRAFT' | 'PUBLISHED';
 
-export interface ArticleProps {
-  id: string;
+export interface ArticleTranslationProps {
+  locale: string;
   title: string;
   slug: string;
   description: string;
   content: string;
+}
+
+export interface ArticleProps {
+  id: string;
   image: string | null;
   status: ArticleStatus;
   publishedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
+  translations: ArticleTranslationProps[];
 }
 
 export class Article {
@@ -27,15 +32,12 @@ export class Article {
 
   // Getters
   public get id(): string { return this.props.id; }
-  public get title(): string { return this.props.title; }
-  public get slug(): string { return this.props.slug; }
-  public get description(): string { return this.props.description; }
-  public get content(): string { return this.props.content; }
   public get image(): string | null { return this.props.image; }
   public get status(): ArticleStatus { return this.props.status; }
   public get publishedAt(): Date | null { return this.props.publishedAt; }
   public get createdAt(): Date { return this.props.createdAt; }
   public get updatedAt(): Date { return this.props.updatedAt; }
+  public get translations(): ArticleTranslationProps[] { return this.props.translations; }
 
   // Business methods
   public publish(): void {
@@ -47,8 +49,13 @@ export class Article {
     this.props.updatedAt = new Date();
   }
 
-  public update(data: Partial<Pick<ArticleProps, 'title' | 'slug' | 'description' | 'content' | 'image'>>): void {
-    this.props = { ...this.props, ...data, updatedAt: new Date() };
+  public update(data: Partial<Pick<ArticleProps, 'image'>> & { translations?: ArticleTranslationProps[] }): void {
+    this.props = {
+      ...this.props,
+      image: data.image !== undefined ? data.image : this.props.image,
+      translations: data.translations !== undefined ? data.translations : this.props.translations,
+      updatedAt: new Date()
+    };
   }
 
   public toJSON(): ArticleProps {

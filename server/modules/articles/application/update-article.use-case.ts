@@ -1,14 +1,11 @@
 import type { ArticleRepository } from '../domain/article.repository';
-import type { Article } from '../domain/article.entity';
+import type { Article, ArticleTranslationProps } from '../domain/article.entity';
 import { ArticleNotFoundError } from '../domain/article.errors';
 
 export interface UpdateArticleInput {
   id: string;
-  title?: string;
-  slug?: string;
-  description?: string;
-  content?: string;
   image?: string | null;
+  translations?: ArticleTranslationProps[];
 }
 
 export class UpdateArticleUseCase {
@@ -21,10 +18,10 @@ export class UpdateArticleUseCase {
       throw new ArticleNotFoundError(input.id);
     }
 
-    const updates: Partial<UpdateArticleInput> = { ...input };
-    delete updates.id; // Don't update ID
-
-    article.update(updates);
+    article.update({
+      image: input.image,
+      translations: input.translations,
+    });
     await this.articleRepository.save(article);
     
     return article;

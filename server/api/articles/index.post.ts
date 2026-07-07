@@ -4,11 +4,14 @@ import { handleDomainError } from '../../utils/handle-errors';
 import { useContainer } from '../../utils/use-container';
 
 const bodySchema = z.object({
-  title: z.string().min(1),
-  slug: z.string().min(1),
-  description: z.string(),
-  content: z.string(),
   image: z.string().url().optional().nullable(),
+  translations: z.array(z.object({
+    locale: z.string().min(2).max(5),
+    title: z.string().min(1),
+    slug: z.string().min(1),
+    description: z.string(),
+    content: z.string(),
+  })).min(1),
 });
 
 export default defineEventHandler(async (event) => {
@@ -19,11 +22,8 @@ export default defineEventHandler(async (event) => {
     
     const useCase = useContainer().resolve<CreateArticleUseCase>('CreateArticleUseCase');
     const article = await useCase.execute({
-      title: body.title,
-      slug: body.slug,
-      description: body.description,
-      content: body.content,
       image: body.image,
+      translations: body.translations,
     });
 
     setResponseStatus(event, 201);

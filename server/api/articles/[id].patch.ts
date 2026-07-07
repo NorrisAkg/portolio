@@ -8,11 +8,14 @@ const paramsSchema = z.object({
 });
 
 const bodySchema = z.object({
-  title: z.string().min(1).optional(),
-  slug: z.string().min(1).optional(),
-  description: z.string().optional(),
-  content: z.string().optional(),
   image: z.string().url().optional().nullable(),
+  translations: z.array(z.object({
+    locale: z.string().min(2).max(5),
+    title: z.string().min(1),
+    slug: z.string().min(1),
+    description: z.string(),
+    content: z.string(),
+  })).optional(),
 });
 
 export default defineEventHandler(async (event) => {
@@ -25,11 +28,8 @@ export default defineEventHandler(async (event) => {
     const useCase = useContainer().resolve<UpdateArticleUseCase>('UpdateArticleUseCase');
     const article = await useCase.execute({
       id: params.id,
-      title: body.title,
-      slug: body.slug,
-      description: body.description,
-      content: body.content,
       image: body.image,
+      translations: body.translations,
     });
 
     return article.toJSON();
