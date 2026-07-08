@@ -34,8 +34,8 @@ const blogPosts = computed(() => listArticles(locale.value as Locale).slice(0, 3
   <div class="max-w-[1120px] mx-auto px-12 max-lg:px-8 max-sm:px-5">
 
     <!-- ── HERO ─────────────────────────────────────────────── -->
-    <section id="home" class="hero-grid pt-[88px] pb-24 max-lg:pt-16 max-lg:pb-[72px] max-sm:flex max-sm:flex-col max-sm:gap-6 max-sm:pt-8 max-sm:pb-12">
-      <div class="hero-heading">
+    <section id="home" class="grid grid-cols-[1.1fr_1fr] grid-rows-[auto_1fr] gap-16 items-start pt-[88px] pb-24 max-lg:pt-16 max-lg:pb-[72px] max-sm:flex max-sm:flex-col max-sm:gap-6 max-sm:pt-8 max-sm:pb-12">
+      <div class="col-start-1 row-start-1 max-sm:col-start-auto max-sm:row-start-auto">
         <AppReveal>
           <h1 class="font-['Montserrat'] font-bold text-[60px] leading-[1.08] tracking-[-0.025em] text-navy dark:text-[#E8ECF5] m-0 mb-6 max-w-[14ch] text-balance max-lg:text-[48px] max-sm:text-[36px]">
             {{ $t('home.headlineA') }} <em class="not-italic text-orange font-bold">{{ $t('home.headlineB') }}</em> {{ $t('home.headlineC') }}
@@ -46,11 +46,11 @@ const blogPosts = computed(() => listArticles(locale.value as Locale).slice(0, 3
         </AppReveal>
       </div>
 
-      <AppReveal class="hero-portrait-slot self-center justify-self-end" :delay="120">
+      <AppReveal class="col-start-2 row-start-1 row-span-2 self-center justify-self-end max-sm:col-start-auto max-sm:row-start-auto max-sm:row-span-1" :delay="120">
         <HeroPortrait />
       </AppReveal>
 
-      <div class="hero-actions">
+      <div class="col-start-1 row-start-2 max-sm:col-start-auto max-sm:row-start-auto">
         <AppReveal :delay="140">
           <div class="flex flex-wrap gap-3 items-center mb-7 max-sm:[&>a]:flex-1 max-sm:[&>a]:justify-center">
             <a
@@ -202,20 +202,3 @@ v-for="tech in ['Solidity', 'Ethers.js', 'Polygon']" :key="tech"
 
   </div>
 </template>
-
-<style scoped>
-/* grid-template-areas not expressible in Tailwind — hero layout only */
-.hero-grid {
-  display: grid;
-  grid-template-columns: 1.1fr 1fr;
-  grid-template-rows: auto 1fr;
-  grid-template-areas:
-    "heading portrait"
-    "actions portrait";
-  gap: 64px;
-  align-items: start;
-}
-.hero-heading      { grid-area: heading; }
-.hero-portrait-slot { grid-area: portrait; }
-.hero-actions      { grid-area: actions; }
-</style>

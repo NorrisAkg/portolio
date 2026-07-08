@@ -183,20 +183,20 @@ useHead(() => ({
       </aside>
 
       <!-- Prose -->
-      <article id="art-prose" class="art-prose">
+      <article id="art-prose" class="max-w-[64ch] text-[17px] leading-[1.75] text-[#2D2D2D] dark:text-[#E8EAEE]">
         <template v-for="(block, i) in article.blocks" :key="i">
-          <p v-if="block.type === 'lede'" class="lede-p">{{ block.text }}</p>
-          <h2 v-else-if="block.type === 'h2'" :id="block.id">{{ block.text }}</h2>
+          <p v-if="block.type === 'lede'" class="text-[19px] leading-[1.6] text-navy dark:text-[#E8ECF5] m-0 mb-8 font-medium max-w-[56ch]">{{ block.text }}</p>
+          <h2 v-else-if="block.type === 'h2'" :id="block.id" class="font-['Montserrat'] font-bold text-[26px] leading-[1.25] text-navy dark:text-[#E8ECF5] tracking-[-0.015em] mt-14 mb-4 scroll-mt-[96px] relative before:content-['§'] before:absolute before:-left-7 before:top-0.5 before:font-['JetBrains_Mono'] before:text-base before:text-orange before:opacity-80 max-md:before:hidden">{{ block.text }}</h2>
           <!-- eslint-disable-next-line vue/no-v-html -->
-          <p v-else-if="block.type === 'p'" v-html="renderInline(block.text)" />
-          <blockquote v-else-if="block.type === 'pull'" class="pull">« {{ block.text }} »</blockquote>
-          <ul v-else-if="block.type === 'ul'">
+          <p v-else-if="block.type === 'p'" class="mb-5 [&>strong]:text-navy dark:[&>strong]:text-white [&>strong]:font-semibold [&>code]:font-['JetBrains_Mono'] [&>code]:text-[0.88em] [&>code]:bg-[#F7F8FA] dark:[&>code]:bg-[#0F1626] [&>code]:border [&>code]:border-[#E5E7EB] dark:[&>code]:border-[#1E2638] [&>code]:px-1.5 [&>code]:py-0.5 [&>code]:rounded [&>code]:text-navy dark:[&>code]:text-orange" v-html="renderInline(block.text)" />
+          <blockquote v-else-if="block.type === 'pull'" class="border-l-3 border-orange pl-5.5 py-1 my-9 font-['Montserrat'] font-semibold text-[22px] leading-[1.4] text-navy dark:text-white tracking-[-0.01em] max-w-[48ch]">« {{ block.text }} »</blockquote>
+          <ul v-else-if="block.type === 'ul'" class="mb-6 pl-0 list-none">
             <!-- eslint-disable-next-line vue/no-v-html -->
-            <li v-for="(item, j) in block.items" :key="j" v-html="renderInline(item)" />
+            <li v-for="(item, j) in block.items" :key="j" class="relative pl-7.5 my-2 leading-[1.6] before:content-[''] before:absolute before:left-2 before:top-3 before:w-1.5 before:h-1.5 before:bg-orange before:rounded-[1px] before:rotate-45 before:flex-shrink-0 [&>strong]:text-navy dark:[&>strong]:text-white [&>strong]:font-semibold [&>code]:font-['JetBrains_Mono'] [&>code]:text-[0.88em] [&>code]:bg-[#F7F8FA] dark:[&>code]:bg-[#0F1626] [&>code]:border [&>code]:border-[#E5E7EB] dark:[&>code]:border-[#1E2638] [&>code]:px-1.5 [&>code]:py-0.5 [&>code]:rounded [&>code]:text-navy dark:[&>code]:text-orange" v-html="renderInline(item)" />
           </ul>
-          <ol v-else-if="block.type === 'ol'">
+          <ol v-else-if="block.type === 'ol'" class="mb-6 pl-0 list-none [counter-reset:olist]">
             <!-- eslint-disable-next-line vue/no-v-html -->
-            <li v-for="(item, j) in block.items" :key="j" v-html="renderInline(item)" />
+            <li v-for="(item, j) in block.items" :key="j" class="relative pl-7.5 my-2 leading-[1.6] [counter-increment:olist] before:content-[counter(olist,decimal-leading-zero)] before:absolute before:left-0 before:top-[1px] before:font-['JetBrains_Mono'] before:text-xs before:font-medium before:text-orange before:tracking-[0.06em] [&>strong]:text-navy dark:[&>strong]:text-white [&>strong]:font-semibold [&>code]:font-['JetBrains_Mono'] [&>code]:text-[0.88em] [&>code]:bg-[#F7F8FA] dark:[&>code]:bg-[#0F1626] [&>code]:border [&>code]:border-[#E5E7EB] dark:[&>code]:border-[#1E2638] [&>code]:px-1.5 [&>code]:py-0.5 [&>code]:rounded [&>code]:text-navy dark:[&>code]:text-orange" v-html="renderInline(item)" />
           </ol>
         </template>
 
