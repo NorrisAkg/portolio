@@ -108,4 +108,32 @@ Lors du branchement du blog à l'API réelle, le serveur local Nitro a retourné
   sudo -u postgres psql -c "CREATE DATABASE portfolio OWNER portfolio;"
   ```
 
+---
+
+## 6. Conflit de paramètres de routage dans `server/api/articles/[slug].get.ts`
+
+### Anomalie :
+L'appel à `GET /api/articles/:slug` (ex. `GET /api/articles/mon-premier-article`) retourne une erreur de validation 400/500 indiquant que `slug` est `undefined` dans le schéma Zod :
+`"message": "Invalid input: expected string, received undefined"`.
+
+### Diagnostic :
+En raison de la structure du dossier (`server/api/articles/[id]/` et `server/api/articles/[id].patch.ts` au même niveau que `[slug].get.ts`), Nitro extrait le paramètre dynamique de l'URL sous le nom de variable `id` (dans `event.context.params.id`) plutôt que `slug`. Par conséquent, le schéma Zod `paramsSchema` de `[slug].get.ts` qui valide `slug: z.string()` échoue systématiquement.
+
+### Solution recommandée pour le développeur :
+Modifier [server/api/articles/[slug].get.ts](file:///home/norris/my-projects/portfolio/server/api/articles/%5Bslug%5D.get.ts) pour s'adapter à la clé de paramètre fournie par Nitro :
+```typescript
+const paramsSchema = z.object({
+  id: z.string(), // Nitro associe le paramètre de l'URL à 'id' à cause du dossier [id]/
+});
+
+export default defineEventHandler(async (event) => {
+  try {
+    const params = await getValidatedRouterParams(event, (data) => paramsSchema.parse(data));
+    
+    const useCase = useContainer().resolve<GetArticleUseCase>('GetArticleUseCase');
+    const article = await useCase.execute({ slug: params.id }); // On passe params.id qui contient le slug réel
+    // ...
+```
+
+
 

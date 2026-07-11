@@ -267,6 +267,7 @@ useHead(() => ({
 </template>
 
 <style scoped>
+@reference "~/assets/css/main.css";
 .blog-content :deep(h2) {
   @apply font-['Montserrat'] font-bold text-[26px] leading-[1.25] text-navy dark:text-[#E8ECF5] tracking-[-0.015em] mt-14 mb-4 scroll-mt-[96px] relative;
 }
