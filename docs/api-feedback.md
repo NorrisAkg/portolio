@@ -76,3 +76,36 @@ De nombreux fichiers importent des éléments utilisés uniquement comme types s
 ### C. Classe utilitaire statique superflue (`@typescript-eslint/no-extraneous-class`)
 * `server/modules/articles/infrastructure/article.mapper.ts` (ligne 4) : La classe `ArticleMapper` ne contient que des méthodes statiques. ESLint recommande d'utiliser des fonctions exportées simples à la place ou de désactiver la règle si ce design est intentionnel.
 
+---
+
+## 5. Erreur de connexion / authentification PostgreSQL dans l'environnement local
+
+Lors du branchement du blog à l'API réelle, le serveur local Nitro a retourné des erreurs 500 sur les endpoints `/api/articles`. 
+
+### Anomalie :
+* Les logs du serveur affichaient : `prisma:error SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string` puis `Authentication failed against the database server, the provided database credentials for postgres are not valid`.
+
+### Diagnostic :
+1. **Absence du fichier `.env`** : Aucun fichier `.env` n'était présent initialement dans le dossier racine du projet. L'application tentait de se connecter avec une chaîne de connexion vide, provoquant l'erreur SCRAM.
+2. **Authentification SCRAM PostgreSQL** : Une fois le fichier `.env` configuré à partir du fichier `.env.example` (`DATABASE_URL="postgresql://postgres:password@localhost:5432/portfolio?schema=public"`), le serveur PostgreSQL local (natif) a retourné une erreur d'authentification.
+3. **Absence de mot de passe / Rôles manquants** :
+   * Le rôle `postgres` sur le serveur local n'a pas de mot de passe configuré, ce qui empêche toute authentification par mot de passe TCP/IP local (qui exige la méthode `scram-sha-256` configurée par défaut dans `pg_hba.conf`).
+   * Les rôles `portfolio` ou `norris` n'existent pas sur l'instance PostgreSQL locale.
+
+### Solutions recommandées pour l'utilisateur :
+* **Option 1 (Recommandée - Utiliser le conteneur Docker existant)** : Démarrer le conteneur PostgreSQL existant de la machine locale qui est mappé sur le port `5435` avec les identifiants `postgres:postgres` (ex. `docker start token-sentry-db`), y créer la base de données `portfolio`, puis mettre à jour le `.env` comme suit :
+  ```env
+  DATABASE_URL="postgresql://postgres:postgres@localhost:5435/portfolio?schema=public"
+  ```
+* **Option 2 (Configuration locale PostgreSQL)** : Définir un mot de passe pour l'utilisateur `postgres` système local en exécutant via le terminal :
+  ```bash
+  sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'votre_mot_de_passe';"
+  ```
+  Et mettre à jour le fichier `.env` avec ce mot de passe.
+* **Option 3 (Création d'un rôle dédié)** : Se connecter en super-utilisateur et créer le rôle et la base de données `portfolio` spécifiquement :
+  ```bash
+  sudo -u postgres psql -c "CREATE USER portfolio WITH PASSWORD 'password';"
+  sudo -u postgres psql -c "CREATE DATABASE portfolio OWNER portfolio;"
+  ```
+
+

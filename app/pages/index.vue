@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { listArticles, type Locale } from '~/utils/articles'
-
-const { locale } = useI18n()
 const localePath = useLocalePath()
 
 // TODO: replace with useFetch('/api/projects?featured=true') in Phase 3
@@ -26,8 +23,9 @@ const projects = [
   },
 ]
 
-// TODO: replace with useFetch('/api/articles?limit=3') in Phase 3
-const blogPosts = computed(() => listArticles(locale.value as Locale).slice(0, 3))
+const { getArticlesList } = useArticles()
+const { articles } = await getArticlesList({ limit: 3 })
+const blogPosts = computed(() => articles.value)
 </script>
 
 <template>

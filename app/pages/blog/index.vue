@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { listArticles, type Locale } from '~/utils/articles'
-
 const { locale } = useI18n()
 const localePath = useLocalePath()
 
-// TODO: replace with useFetch('/api/articles') in Phase 3
-const allPosts = computed(() => listArticles(locale.value as Locale))
+const { getArticlesList } = useArticles()
+const { articles } = await getArticlesList()
+
+const allPosts = computed(() => articles.value)
 
 const activeFilter = ref('all')
 

@@ -1,39 +1,44 @@
 <script setup lang="ts">
-import { ARTICLES, resolveArticle, listArticles, type Locale } from '~/utils/articles'
-
 const route = useRoute()
-const { locale } = useI18n()
 const localePath = useLocalePath()
 
 const slug = computed(() => route.params.slug as string)
 
-const article = computed(() => resolveArticle(slug.value, locale.value as Locale))
+const { getArticleBySlug, getArticlesList } = useArticles()
+
+// 1. Fetch current article
+const { article } = await getArticleBySlug(slug.value)
 
 // 404 when the slug doesn't match any article
 if (!article.value) {
   throw createError({ statusCode: 404, statusMessage: 'Article not found', fatal: true })
 }
 
-const allPosts = computed(() => listArticles(locale.value as Locale))
+// 2. Fetch all articles to compute navigation (prev, next, related)
+const { articles: allPosts } = await getArticlesList()
 
 const related = computed(() => {
   if (!article.value) return []
   const me = article.value
-  const others = allPosts.value.filter(p => p.idx !== me.idx)
+  const others = allPosts.value.filter(p => p.id !== me.id)
   const sameTag = others.filter(p => p.tag === me.tag)
   const rest = others.filter(p => p.tag !== me.tag)
   return [...sameTag, ...rest].slice(0, 3)
 })
 
 const prev = computed(() => {
-  if (!article.value) return null
-  const i = (article.value.idx - 1 + ARTICLES.length) % ARTICLES.length
+  if (!article.value || allPosts.value.length === 0) return null
+  const meIdx = allPosts.value.findIndex(p => p.id === article.value!.id)
+  if (meIdx === -1) return null
+  const i = (meIdx - 1 + allPosts.value.length) % allPosts.value.length
   return allPosts.value[i]
 })
 
 const next = computed(() => {
-  if (!article.value) return null
-  const i = (article.value.idx + 1) % ARTICLES.length
+  if (!article.value || allPosts.value.length === 0) return null
+  const meIdx = allPosts.value.findIndex(p => p.id === article.value!.id)
+  if (meIdx === -1) return null
+  const i = (meIdx + 1) % allPosts.value.length
   return allPosts.value[i]
 })
 
@@ -77,15 +82,6 @@ const scrollToHeading = (id: string, e: Event) => {
     const top = el.getBoundingClientRect().top + window.scrollY - 100
     window.scrollTo({ top, behavior: 'smooth' })
   }
-}
-
-// Inline rendering: backtick `code` only, all other HTML escaped.
-const renderInline = (text: string): string => {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/`([^`]+)`/g, '<code>$1</code>')
 }
 
 // SEO
@@ -184,21 +180,7 @@ useHead(() => ({
 
       <!-- Prose -->
       <article id="art-prose" class="max-w-[64ch] text-[17px] leading-[1.75] text-[#2D2D2D] dark:text-[#E8EAEE]">
-        <template v-for="(block, i) in article.blocks" :key="i">
-          <p v-if="block.type === 'lede'" class="text-[19px] leading-[1.6] text-navy dark:text-[#E8ECF5] m-0 mb-8 font-medium max-w-[56ch]">{{ block.text }}</p>
-          <h2 v-else-if="block.type === 'h2'" :id="block.id" class="font-['Montserrat'] font-bold text-[26px] leading-[1.25] text-navy dark:text-[#E8ECF5] tracking-[-0.015em] mt-14 mb-4 scroll-mt-[96px] relative before:content-['§'] before:absolute before:-left-7 before:top-0.5 before:font-['JetBrains_Mono'] before:text-base before:text-orange before:opacity-80 max-md:before:hidden">{{ block.text }}</h2>
-          <!-- eslint-disable-next-line vue/no-v-html -->
-          <p v-else-if="block.type === 'p'" class="mb-5 [&>strong]:text-navy dark:[&>strong]:text-white [&>strong]:font-semibold [&>code]:font-['JetBrains_Mono'] [&>code]:text-[0.88em] [&>code]:bg-[#F7F8FA] dark:[&>code]:bg-[#0F1626] [&>code]:border [&>code]:border-[#E5E7EB] dark:[&>code]:border-[#1E2638] [&>code]:px-1.5 [&>code]:py-0.5 [&>code]:rounded [&>code]:text-navy dark:[&>code]:text-orange" v-html="renderInline(block.text)" />
-          <blockquote v-else-if="block.type === 'pull'" class="border-l-3 border-orange pl-5.5 py-1 my-9 font-['Montserrat'] font-semibold text-[22px] leading-[1.4] text-navy dark:text-white tracking-[-0.01em] max-w-[48ch]">« {{ block.text }} »</blockquote>
-          <ul v-else-if="block.type === 'ul'" class="mb-6 pl-0 list-none">
-            <!-- eslint-disable-next-line vue/no-v-html -->
-            <li v-for="(item, j) in block.items" :key="j" class="relative pl-7.5 my-2 leading-[1.6] before:content-[''] before:absolute before:left-2 before:top-3 before:w-1.5 before:h-1.5 before:bg-orange before:rounded-[1px] before:rotate-45 before:flex-shrink-0 [&>strong]:text-navy dark:[&>strong]:text-white [&>strong]:font-semibold [&>code]:font-['JetBrains_Mono'] [&>code]:text-[0.88em] [&>code]:bg-[#F7F8FA] dark:[&>code]:bg-[#0F1626] [&>code]:border [&>code]:border-[#E5E7EB] dark:[&>code]:border-[#1E2638] [&>code]:px-1.5 [&>code]:py-0.5 [&>code]:rounded [&>code]:text-navy dark:[&>code]:text-orange" v-html="renderInline(item)" />
-          </ul>
-          <ol v-else-if="block.type === 'ol'" class="mb-6 pl-0 list-none [counter-reset:olist]">
-            <!-- eslint-disable-next-line vue/no-v-html -->
-            <li v-for="(item, j) in block.items" :key="j" class="relative pl-7.5 my-2 leading-[1.6] [counter-increment:olist] before:content-[counter(olist,decimal-leading-zero)] before:absolute before:left-0 before:top-[1px] before:font-['JetBrains_Mono'] before:text-xs before:font-medium before:text-orange before:tracking-[0.06em] [&>strong]:text-navy dark:[&>strong]:text-white [&>strong]:font-semibold [&>code]:font-['JetBrains_Mono'] [&>code]:text-[0.88em] [&>code]:bg-[#F7F8FA] dark:[&>code]:bg-[#0F1626] [&>code]:border [&>code]:border-[#E5E7EB] dark:[&>code]:border-[#1E2638] [&>code]:px-1.5 [&>code]:py-0.5 [&>code]:rounded [&>code]:text-navy dark:[&>code]:text-orange" v-html="renderInline(item)" />
-          </ol>
-        </template>
+        <MDC :value="article.content" class="blog-content" />
 
         <!-- End-of-article footer -->
         <div class="mt-14 pt-7 border-t border-border flex flex-wrap gap-[18px] items-center justify-between">
@@ -283,3 +265,61 @@ useHead(() => ({
     </AppReveal>
   </div>
 </template>
+
+<style scoped>
+.blog-content :deep(h2) {
+  @apply font-['Montserrat'] font-bold text-[26px] leading-[1.25] text-navy dark:text-[#E8ECF5] tracking-[-0.015em] mt-14 mb-4 scroll-mt-[96px] relative;
+}
+@media (min-width: 768px) {
+  .blog-content :deep(h2)::before {
+    content: "§";
+    @apply absolute -left-7 top-0.5 font-['JetBrains_Mono'] text-base text-orange opacity-80;
+  }
+}
+.blog-content :deep(p) {
+  @apply mb-5 leading-[1.75];
+}
+.blog-content :deep(p strong) {
+  @apply text-navy dark:text-white font-semibold;
+}
+.blog-content :deep(p code) {
+  @apply font-['JetBrains_Mono'] text-[0.88em] bg-[#F7F8FA] dark:bg-[#0F1626] border border-[#E5E7EB] dark:border-[#1E2638] px-1.5 py-0.5 rounded text-navy dark:text-orange;
+}
+.blog-content :deep(blockquote) {
+  @apply border-l-3 border-orange pl-5.5 py-1 my-9 font-['Montserrat'] font-semibold text-[22px] leading-[1.4] text-navy dark:text-white tracking-[-0.01em] max-w-[48ch];
+}
+.blog-content :deep(ul) {
+  @apply mb-6 pl-0 list-none;
+}
+.blog-content :deep(ul > li) {
+  @apply relative pl-7.5 my-2 leading-[1.6];
+}
+.blog-content :deep(ul > li)::before {
+  content: "";
+  @apply absolute left-2 top-3 w-1.5 h-1.5 bg-orange rounded-[1px] rotate-45;
+}
+.blog-content :deep(ul > li strong) {
+  @apply text-navy dark:text-white font-semibold;
+}
+.blog-content :deep(ul > li code) {
+  @apply font-['JetBrains_Mono'] text-[0.88em] bg-[#F7F8FA] dark:bg-[#0F1626] border border-[#E5E7EB] dark:border-[#1E2638] px-1.5 py-0.5 rounded text-navy dark:text-orange;
+}
+.blog-content :deep(ol) {
+  @apply mb-6 pl-0 list-none;
+  counter-reset: olist;
+}
+.blog-content :deep(ol > li) {
+  @apply relative pl-7.5 my-2 leading-[1.6];
+  counter-increment: olist;
+}
+.blog-content :deep(ol > li)::before {
+  content: counter(olist, decimal-leading-zero);
+  @apply absolute left-0 top-[1px] font-['JetBrains_Mono'] text-xs font-medium text-orange tracking-[0.06em];
+}
+.blog-content :deep(ol > li strong) {
+  @apply text-navy dark:text-white font-semibold;
+}
+.blog-content :deep(ol > li code) {
+  @apply font-['JetBrains_Mono'] text-[0.88em] bg-[#F7F8FA] dark:bg-[#0F1626] border border-[#E5E7EB] dark:border-[#1E2638] px-1.5 py-0.5 rounded text-navy dark:text-orange;
+}
+</style>
