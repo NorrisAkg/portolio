@@ -127,25 +127,14 @@ export const useArticles = () => {
   }
 
   // Fetch one article by slug
-  // NOTE: GET /api/articles/:slug is broken due to a Nitro routing conflict (sibling [id]/ folder
-  // causes the param to be resolved as `id` instead of `slug`, failing the Zod schema).
-  // Workaround: fetch the full published list and find the matching article client-side.
-  // See docs/api-feedback.md §6 for details.
   const getArticleBySlug = async (slug: string) => {
-    const { data, error, pending, refresh } = await useFetch<PaginatedResult<ArticleProps>>('/api/articles', {
-      query: { status: 'PUBLISHED', limit: 100 },
-    })
+    const { data, error, pending, refresh } = await useFetch<ArticleProps>(`/api/articles/${slug}`)
 
     const article = computed(() => {
       if (!data.value) return null
-      const all = data.value.data
-      const match = all.find(art =>
-        art.translations.some(t => t.slug === slug),
-      )
-      if (!match) return null
-      // Use a stable index derived from the article's position in the list for tone
-      const idx = all.indexOf(match)
-      return mapArticle(match, idx)
+      // We don't have index here, but we can generate one from id hash to keep tone stable
+      const charCodeSum = data.value.id.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0)
+      return mapArticle(data.value, charCodeSum)
     })
 
     return {

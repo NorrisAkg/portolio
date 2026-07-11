@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ArticleProps, PaginatedResult } from '../../../../shared/types/article'
+import type { ArticleProps } from '../../../../shared/types/article'
 import { slugify } from '../../../../shared/utils/slugify'
 
 definePageMeta({
@@ -14,31 +14,18 @@ const router = useRouter()
 const slugParam = computed(() => route.params.slug as string)
 
 
-// Fetch all articles to find the matching one (workaround for backend bug where GET /api/articles/:slug fails due to param mapping)
-const [ { data: publishedRes }, { data: draftsRes } ] = await Promise.all([
-  useFetch<PaginatedResult<ArticleProps>>('/api/articles', { query: { status: 'PUBLISHED', limit: 100 } }),
-  useFetch<PaginatedResult<ArticleProps>>('/api/articles', { query: { status: 'DRAFT', limit: 100 } })
-])
+// Fetch raw article including all translations
+const { data: rawArticle, error: fetchError } = await useFetch<ArticleProps>(`/api/articles/${slugParam.value}`)
 
-const rawArticle = computed(() => {
-  const all = [
-    ...(publishedRes.value?.data || []),
-    ...(draftsRes.value?.data || [])
-  ]
-  return all.find(art => 
-    art.translations.some(t => t.slug === slugParam.value)
-  ) || null
-})
-
-if (!rawArticle.value) {
+if (fetchError.value || !rawArticle.value) {
   throw createError({ statusCode: 404, statusMessage: 'Article introuvable', fatal: true })
 }
 
-const image = ref(rawArticle.value?.image || '')
+const image = ref(rawArticle.value.image || '')
 const activeFormTab = ref<'fr' | 'en'>('fr')
 
-const frTranslation = rawArticle.value?.translations.find(t => t.locale === 'fr')
-const enTranslation = rawArticle.value?.translations.find(t => t.locale === 'en')
+const frTranslation = rawArticle.value.translations.find(t => t.locale === 'fr')
+const enTranslation = rawArticle.value.translations.find(t => t.locale === 'en')
 
 const frForm = ref({
   title: frTranslation?.title || '',
