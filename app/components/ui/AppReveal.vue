@@ -14,7 +14,7 @@ onMounted(() => {
       io.disconnect()
     }
   }, { threshold: 0.08 })
-  io.observe(el.value)
+  io.observe(el.value as any)
   onBeforeUnmount(() => io.disconnect())
 })
 </script>

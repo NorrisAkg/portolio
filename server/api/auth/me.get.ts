@@ -1,23 +1,22 @@
-import type { H3Event } from 'h3';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'portfolio-secret-key-12345';
 
-export async function requireAdmin(event: H3Event) {
+export default defineEventHandler(async (event) => {
   const token = getCookie(event, 'auth_token');
 
   if (!token) {
-    throw createError({ statusCode: 401, statusMessage: 'Non autorisé' });
+    return null;
   }
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as { id: string; email: string };
-    event.context.user = {
+    return {
       id: decoded.id,
       email: decoded.email,
     };
-    return true;
   } catch {
-    throw createError({ statusCode: 401, statusMessage: 'Session expirée ou invalide' });
+    deleteCookie(event, 'auth_token');
+    return null;
   }
-}
+});
