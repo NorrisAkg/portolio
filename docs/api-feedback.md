@@ -135,5 +135,32 @@ export default defineEventHandler(async (event) => {
     // ...
 ```
 
+---
+
+## 7. Absence des endpoints API pour les Projets (`/api/projects`)
+
+### Anomalie :
+Il n'existe actuellement aucune route d'API dans `server/api/` pour gérer les projets (comme `GET /api/projects` ou les routes admin `POST`, `PATCH`, `DELETE`). 
+
+### Impact sur le Frontend :
+* La page d'accueil ([app/pages/index.vue](file:///home/norris/my-projects/portfolio/app/pages/index.vue)) et la page Projets ([app/pages/projects/index.vue](file:///home/norris/my-projects/portfolio/app/pages/projects/index.vue)) continuent d'utiliser des données statiques/mockées en attendant l'API.
+* L'onglet "Projets" de la console d'administration ([app/pages/admin/index.vue](file:///home/norris/my-projects/portfolio/app/pages/admin/index.vue)) affiche également des projets simulés sans interactivité de modification/suppression réelle.
+
+### Solution recommandée pour le développeur :
+Créer les routes d'API correspondantes (ex. `server/api/projects/index.get.ts`, `server/api/projects/index.post.ts`, etc.) connectées à un cas d'usage Prisma de la même manière que pour les articles.
+
+---
+
+## 8. Absence de l'endpoint pour le formulaire de contact (`POST /api/contact`)
+
+### Anomalie :
+La route `POST /api/contact` est manquante dans le backend pour traiter l'envoi de messages via Nodemailer.
+
+### Impact sur le Frontend :
+Le composant de contact ([app/components/ContactSection.vue](file:///home/norris/my-projects/portfolio/app/components/ContactSection.vue)) simule la soumission du message avec un délai de 400ms et une notification toast positive.
+
+### Solution recommandée pour le développeur :
+Créer le fichier `server/api/contact.post.ts` et configurer le module `nuxt-nodemailer` dans le backend pour relayer les courriels saisis.
+
 
 
