@@ -6,6 +6,22 @@ const localePath = useLocalePath()
 const route = useRoute()
 const router = useRouter()
 
+useSeoMeta({
+  title: computed(() => locale.value === 'fr'
+    ? 'Journal — Réflexions et notes de terrain'
+    : 'Journal — Field notes and reflections'),
+  description: computed(() => locale.value === 'fr'
+    ? 'Des textes sur la tech, le freelance et la manière de transformer un problème business en livrable digital. Mis à jour ~2 fois par mois.'
+    : 'Articles on tech, freelancing, and turning business problems into digital deliverables. Updated ~twice a month.'),
+  ogTitle: computed(() => locale.value === 'fr'
+    ? 'Journal de Norris Akogbede — Réflexions tech & freelance'
+    : 'Norris Akogbede\'s Journal — Tech & freelance reflections'),
+  ogDescription: computed(() => locale.value === 'fr'
+    ? 'Réflexions, notes et retours d\'expérience sur la tech, le freelance et le développement produit.'
+    : 'Reflections, notes and lessons learned on tech, freelancing and product development.'),
+  ogUrl: computed(() => `https://norrisakogbede.com${locale.value === 'en' ? '/en' : ''}/blog`),
+})
+
 const { mapArticle } = useArticles()
 
 const LIMIT = 10

@@ -1,4 +1,22 @@
 <script setup lang="ts">
+const { locale } = useI18n()
+
+useSeoMeta({
+  title: computed(() => locale.value === 'fr'
+    ? 'Projets — Études de cas et missions livrées'
+    : 'Projects — Case studies and delivered missions'),
+  description: computed(() => locale.value === 'fr'
+    ? 'Une sélection de missions Web2 et Web3, de la définition du besoin business jusqu\'à la mise en production.'
+    : 'A selection of Web2 and Web3 projects, from business requirement to production delivery.'),
+  ogTitle: computed(() => locale.value === 'fr'
+    ? 'Projets de Norris Akogbede — Études de cas'
+    : 'Norris Akogbede\'s Projects — Case Studies'),
+  ogDescription: computed(() => locale.value === 'fr'
+    ? 'Marketplace agricole, app de fidélité, tokenisation immobilière, back-office SaaS — des projets qui ont un impact business mesurable.'
+    : 'Agricultural marketplace, loyalty app, real estate tokenization, SaaS back-office — projects with measurable business impact.'),
+  ogUrl: computed(() => `https://norrisakogbede.com${locale.value === 'en' ? '/en' : ''}/projects`),
+})
+
 // TODO: replace with useFetch('/api/projects') in Phase 3
 const projects = [
   {

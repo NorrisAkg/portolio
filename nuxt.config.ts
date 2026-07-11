@@ -3,6 +3,29 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
 
+  app: {
+    head: {
+      titleTemplate: '%s — Norris Akogbede',
+      htmlAttrs: { lang: 'fr' },
+      meta: [
+        { charset: 'utf-8' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        {
+          name: 'description',
+          content: 'Développeur web & mobile freelance. Nuxt.js, NestJS, React Native et Solidity. Disponible pour mission.',
+        },
+        { property: 'og:site_name', content: 'Norris Akogbede' },
+        { property: 'og:type', content: 'website' },
+        { property: 'og:image', content: '/og-default.png' },
+        { name: 'twitter:card', content: 'summary_large_image' },
+        { name: 'twitter:creator', content: '@norrisakogbede' },
+      ],
+      link: [
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+      ],
+    },
+  },
+
   modules: [
     '@nuxt/eslint',
     '@nuxt/ui',

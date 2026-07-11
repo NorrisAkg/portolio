@@ -1,5 +1,28 @@
 <script setup lang="ts">
+const { locale } = useI18n()
 const localePath = useLocalePath()
+
+useSeoMeta({
+  title: computed(() => locale.value === 'fr'
+    ? 'Développeur Web & Mobile Freelance'
+    : 'Freelance Web & Mobile Developer'),
+  description: computed(() => locale.value === 'fr'
+    ? 'Développeur web & mobile freelance basé à Cotonou. Nuxt.js, NestJS, React Native, Solidity. Disponible pour missions Web2 & Web3.'
+    : 'Freelance web & mobile developer based in Cotonou. Nuxt.js, NestJS, React Native, Solidity. Available for Web2 & Web3 projects.'),
+  ogTitle: computed(() => locale.value === 'fr'
+    ? 'Norris Akogbede — Développeur Web & Mobile Freelance'
+    : 'Norris Akogbede — Freelance Web & Mobile Developer'),
+  ogDescription: computed(() => locale.value === 'fr'
+    ? 'Développeur web & mobile freelance basé à Cotonou. Nuxt.js, NestJS, React Native, Solidity.'
+    : 'Freelance web & mobile developer based in Cotonou. Nuxt.js, NestJS, React Native, Solidity.'),
+  ogUrl: computed(() => `https://norrisakogbede.com${locale.value === 'en' ? '/en' : ''}`),
+  twitterTitle: computed(() => locale.value === 'fr'
+    ? 'Norris Akogbede — Développeur Freelance'
+    : 'Norris Akogbede — Freelance Developer'),
+  twitterDescription: computed(() => locale.value === 'fr'
+    ? 'Développeur web & mobile freelance. Nuxt.js, NestJS, React Native, Solidity.'
+    : 'Freelance web & mobile developer. Nuxt.js, NestJS, React Native, Solidity.'),
+})
 
 // TODO: replace with useFetch('/api/projects?featured=true') in Phase 3
 const projects = [

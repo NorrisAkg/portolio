@@ -85,12 +85,31 @@ const scrollToHeading = (id: string, e: Event) => {
 }
 
 // SEO
-useHead(() => ({
-  title: article.value ? `${article.value.title} — Norris Akogbede` : 'Article',
-  meta: article.value
-    ? [{ name: 'description', content: article.value.excerpt }]
-    : [],
-}))
+const { locale } = useI18n()
+const articleUrl = computed(() =>
+  `https://norrisakogbede.com${locale.value === 'en' ? '/en' : ''}/blog/${article.value?.slug ?? ''}`,
+)
+
+useSeoMeta({
+  title: computed(() => article.value?.title ?? 'Article'),
+  description: computed(() => article.value?.excerpt ?? ''),
+  ogType: 'article',
+  ogTitle: computed(() => article.value ? `${article.value.title} — Norris Akogbede` : 'Article'),
+  ogDescription: computed(() => article.value?.excerpt ?? ''),
+  ogUrl: articleUrl,
+  ogImage: computed(() =>
+    article.value?.cover
+      ? `https://norrisakogbede.com/images/${article.value.cover}`
+      : '/og-default.png',
+  ),
+  twitterTitle: computed(() => article.value?.title ?? 'Article'),
+  twitterDescription: computed(() => article.value?.excerpt ?? ''),
+  twitterImage: computed(() =>
+    article.value?.cover
+      ? `https://norrisakogbede.com/images/${article.value.cover}`
+      : '/og-default.png',
+  ),
+})
 </script>
 
 <template>
