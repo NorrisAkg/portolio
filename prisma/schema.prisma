@@ -45,11 +45,10 @@ model ArticleTranslation {
 
 model Project {
   id          String   @id @default(uuid())
-  title       String
-  slug        String   @unique
-  description String
-  content     String
-  image       String?
+  image       String?  // Name of the cover image file (labeled "label" on frontend)
+  tone        String   @default("cool") // "warm", "cool", "navy"
+  year        String
+  dur         String
   githubUrl   String?
   liveUrl     String?
   featured    Boolean  @default(false)
@@ -57,6 +56,23 @@ model Project {
   updatedAt   DateTime @updatedAt
 
   technologies Technology[]
+  translations ProjectTranslation[]
+}
+
+model ProjectTranslation {
+  id            String   @id @default(uuid())
+  projectId     String
+  locale        String   // "fr" or "en"
+  title         String   // Mapped to project name
+  slug          String   @unique
+  description   String   // Mapped to project "problem"
+  content       String   // Project details/writeup
+  outcome       String   // Business outcome (e.g. "+38% average margin")
+  durationLabel String   // Full duration label (e.g. "8 weeks · MVP → production")
+
+  project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, locale])
 }
 
 model Tag {
