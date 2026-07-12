@@ -137,17 +137,9 @@ export default defineEventHandler(async (event) => {
 
 ---
 
-## 7. Absence des endpoints API pour les Projets (`/api/projects`)
+## 7. [RÉSOLU] Absence des endpoints API pour les Projets (`/api/projects`)
 
-### Anomalie :
-Il n'existe actuellement aucune route d'API dans `server/api/` pour gérer les projets (comme `GET /api/projects` ou les routes admin `POST`, `PATCH`, `DELETE`). 
-
-### Impact sur le Frontend :
-* La page d'accueil ([app/pages/index.vue](file:///home/norris/my-projects/portfolio/app/pages/index.vue)) et la page Projets ([app/pages/projects/index.vue](file:///home/norris/my-projects/portfolio/app/pages/projects/index.vue)) continuent d'utiliser des données statiques/mockées en attendant l'API.
-* L'onglet "Projets" de la console d'administration ([app/pages/admin/index.vue](file:///home/norris/my-projects/portfolio/app/pages/admin/index.vue)) affiche également des projets simulés sans interactivité de modification/suppression réelle.
-
-### Solution recommandée pour le développeur :
-Créer les routes d'API correspondantes (ex. `server/api/projects/index.get.ts`, `server/api/projects/index.post.ts`, etc.) connectées à un cas d'usage Prisma de la même manière que pour les articles.
+* **Résolu par** : Création du module `projects` (`server/modules/projects/`) avec ses cas d'usage (`ListProjectsUseCase`, `GetProjectUseCase`), son dépôt d'infrastructure `PrismaProjectRepository`, sa configuration d'injection de dépendances, et ses routes d'API associées (`GET /api/projects` et `GET /api/projects/:slug`).
 
 ---
 

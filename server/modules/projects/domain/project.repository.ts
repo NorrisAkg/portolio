@@ -1,0 +1,11 @@
+import type { Project } from './project.entity';
+
+export interface FindAllProjectsParams {
+  featured?: boolean;
+}
+
+export interface ProjectRepository {
+  findById(id: string): Promise<Project | null>;
+  findBySlug(slug: string): Promise<Project | null>;
+  findAll(params: FindAllProjectsParams): Promise<Project[]>;
+}
