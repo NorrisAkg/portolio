@@ -9,7 +9,7 @@ export class PrismaProjectRepository implements ProjectRepository {
   async findById(id: string): Promise<Project | null> {
     const prismaProject = await this.prisma.project.findUnique({
       where: { id },
-      include: { translations: true },
+      include: { translations: true, technologies: true },
     });
 
     if (!prismaProject) return null;
@@ -23,7 +23,7 @@ export class PrismaProjectRepository implements ProjectRepository {
           some: { slug },
         },
       },
-      include: { translations: true },
+      include: { translations: true, technologies: true },
     });
 
     if (!prismaProject) return null;
@@ -39,7 +39,7 @@ export class PrismaProjectRepository implements ProjectRepository {
 
     const prismaProjects = await this.prisma.project.findMany({
       where,
-      include: { translations: true },
+      include: { translations: true, technologies: true },
       orderBy: { createdAt: 'desc' },
     });
 

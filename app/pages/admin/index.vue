@@ -56,13 +56,14 @@ const handlePublish = async (id: string) => {
   }
 }
 
-// Mock Projects data for the dashboard (since endpoint is not yet implemented)
-const mockProjects = ref([
-  { id: '1', name: 'Agricultural marketplace — Benin', year: '2025', status: 'FEATURED' },
-  { id: '2', name: 'Mobile loyalty app — Cotonou', year: '2024', status: 'ACTIVE' },
-  { id: '3', name: 'Tokenization platform — Web3', year: '2025', status: 'FEATURED' },
-  { id: '4', name: 'B2B SaaS back-office — Lyon', year: '2024', status: 'ACTIVE' },
-])
+const { getProjectsList } = useProjects()
+const { projects: realProjects } = await getProjectsList()
+const mockProjects = computed(() => realProjects.value.map(p => ({
+  id: p.id,
+  name: p.name,
+  year: p.year,
+  status: p.featured ? 'FEATURED' : 'ACTIVE',
+})))
 </script>
 
 <template>
@@ -196,12 +197,8 @@ const mockProjects = ref([
       </div>
     </div>
 
-    <!-- PROJECTS CONTENT (Mocked interface) -->
+    <!-- PROJECTS CONTENT -->
     <div v-if="activeTab === 'projects'" class="space-y-6">
-      <div class="bg-amber-500/10 border border-amber-500/20 text-amber-800 dark:text-amber-200 text-xs px-4 py-3 rounded-lg flex items-center gap-2">
-        <span>💡</span>
-        <span>L'API Projets n'est pas encore implémentée sur le backend. Ces données sont simulées pour le moment.</span>
-      </div>
 
       <div class="bg-white dark:bg-[#0A0F1A] border border-border rounded-2xl overflow-hidden shadow-sm">
         <table class="w-full text-left border-collapse">

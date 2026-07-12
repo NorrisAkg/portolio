@@ -8,6 +8,13 @@ export interface ProjectTranslationProps {
   durationLabel: string;
 }
 
+export interface TechnologyProps {
+  id: string;
+  name: string;
+  slug: string;
+  icon: string | null;
+}
+
 export interface ProjectProps {
   id: string;
   image: string | null;
@@ -20,4 +27,5 @@ export interface ProjectProps {
   createdAt: string;
   updatedAt: string;
   translations: ProjectTranslationProps[];
+  technologies?: TechnologyProps[];
 }

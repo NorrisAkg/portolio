@@ -24,27 +24,8 @@ useSeoMeta({
     : 'Freelance web & mobile developer. Nuxt.js, NestJS, React Native, Solidity.'),
 })
 
-// TODO: replace with useFetch('/api/projects?featured=true') in Phase 3
-const projects = [
-  {
-    year: '2025', dur: '8w', name: 'Agricultural marketplace — Benin',
-    problem: 'Connecting 400+ producers directly to urban buyers, no middlemen.',
-    bullets: [['TECH', 'Nuxt 3 · NestJS · PostgreSQL · Stripe'], ['OUTCOME', '+38% average margin for producers'], ['DURATION', '8 weeks · MVP → production']] as [string, string][],
-    label: 'MARKETPLACE_AGRO_BJ_2025.PNG', tone: 'warm' as const,
-  },
-  {
-    year: '2024', dur: '5w', name: 'Mobile loyalty app — Cotonou',
-    problem: 'Replacing an unreadable paper-card system with a simple, fast app.',
-    bullets: [['TECH', 'React Native · NestJS · Firebase'], ['OUTCOME', '+62% retention in 3 months'], ['DURATION', '5 weeks · 8 partner stores']] as [string, string][],
-    label: 'APP_FIDELITE_COT_2024.PNG', tone: 'cool' as const,
-  },
-  {
-    year: '2025', dur: '12w', name: 'Tokenization platform — Web3',
-    problem: 'Fractionalising real-estate ownership for the diaspora.',
-    bullets: [['TECH', 'Solidity · Nuxt 3 · Ethers.js · Polygon'], ['OUTCOME', '4 assets tokenised · €312K raised'], ['DURATION', '12 weeks · external audit included']] as [string, string][],
-    label: 'TOKENISATION_RWA_2025.PNG', tone: 'navy' as const,
-  },
-]
+const { getProjectsList } = useProjects()
+const { projects } = await getProjectsList({ featured: true })
 
 const { getArticlesList } = useArticles()
 const { articles } = await getArticlesList({ limit: 3 })

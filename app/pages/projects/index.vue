@@ -17,45 +17,8 @@ useSeoMeta({
   ogUrl: computed(() => `https://norrisakogbede.com${locale.value === 'en' ? '/en' : ''}/projects`),
 })
 
-// TODO: replace with useFetch('/api/projects') in Phase 3
-const projects = [
-  {
-    year: '2025', dur: '8w', name: 'Agricultural marketplace — Benin',
-    problem: 'Connecting 400+ producers directly to urban buyers, no middlemen.',
-    bullets: [['TECH', 'Nuxt 3 · NestJS · PostgreSQL · Stripe'], ['OUTCOME', '+38% average margin for producers'], ['DURATION', '8 weeks · MVP → production']] as [string, string][],
-    label: 'MARKETPLACE_AGRO_BJ_2025.PNG', tone: 'warm' as const,
-  },
-  {
-    year: '2024', dur: '5w', name: 'Mobile loyalty app — Cotonou',
-    problem: 'Replacing an unreadable paper-card system with a simple, fast app.',
-    bullets: [['TECH', 'React Native · NestJS · Firebase'], ['OUTCOME', '+62% retention in 3 months'], ['DURATION', '5 weeks · 8 partner stores']] as [string, string][],
-    label: 'APP_FIDELITE_COT_2024.PNG', tone: 'cool' as const,
-  },
-  {
-    year: '2025', dur: '12w', name: 'Tokenization platform — Web3',
-    problem: 'Fractionalising real-estate ownership for the diaspora.',
-    bullets: [['TECH', 'Solidity · Nuxt 3 · Ethers.js · Polygon'], ['OUTCOME', '4 assets tokenised · €312K raised'], ['DURATION', '12 weeks · external audit included']] as [string, string][],
-    label: 'TOKENISATION_RWA_2025.PNG', tone: 'navy' as const,
-  },
-  {
-    year: '2024', dur: '6w', name: 'B2B SaaS back-office — Lyon',
-    problem: 'Internal tool to run 12K orders/month with 4 operators.',
-    bullets: [['TECH', 'Nuxt 3 · NestJS · PostgreSQL'], ['OUTCOME', '−45% processing time per order'], ['DURATION', '6 weeks · progressive rewrite']] as [string, string][],
-    label: 'BACKOFFICE_SAAS_LYO_2024.PNG', tone: 'cool' as const,
-  },
-  {
-    year: '2023', dur: '10w', name: 'Local delivery app — Dakar',
-    problem: 'iOS/Android app for independent couriers and restaurants.',
-    bullets: [['TECH', 'React Native · NestJS · Mapbox'], ['OUTCOME', '1,200 deliveries/month · 3 cities'], ['DURATION', '10 weeks · MVP funded']] as [string, string][],
-    label: 'LIVRAISON_DKR_2023.PNG', tone: 'warm' as const,
-  },
-  {
-    year: '2023', dur: '4w', name: 'API & analytics dashboard — fintech',
-    problem: 'Aggregating multi-channel transactions for an African neobank.',
-    bullets: [['TECH', 'NestJS · TimescaleDB · Grafana'], ['OUTCOME', 'Real-time reporting · audit-ready'], ['DURATION', '4 weeks · in-house delivery']] as [string, string][],
-    label: 'FINTECH_API_2023.PNG', tone: 'navy' as const,
-  },
-]
+const { getProjectsList } = useProjects()
+const { projects } = await getProjectsList()
 </script>
 
 <template>
