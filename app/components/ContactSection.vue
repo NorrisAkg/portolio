@@ -10,13 +10,24 @@ const submitting = ref(false)
 const handleSubmit = async (e: Event) => {
   e.preventDefault()
   submitting.value = true
-  // TODO: wire to POST /api/contact in Phase 4 (nuxt-nodemailer)
-  await new Promise(resolve => setTimeout(resolve, 400))
-  submitting.value = false
-  name.value = ''
-  email.value = ''
-  message.value = ''
-  toast.add({ title: t('contact.heading'), description: '✓ Message reçu — je reviens vers vous rapidement.' })
+  try {
+    await $fetch('/api/contact', {
+      method: 'POST',
+      body: {
+        name: name.value,
+        email: email.value,
+        message: message.value,
+      },
+    })
+    name.value = ''
+    email.value = ''
+    message.value = ''
+    toast.add({ title: t('contact.heading'), description: '✓ Message envoyé — je vous réponds au plus vite.' })
+  } catch {
+    toast.add({ title: 'Erreur', description: 'Impossible d\'envoyer le message. Veuillez réessayer.' })
+  } finally {
+    submitting.value = false
+  }
 }
 </script>
 

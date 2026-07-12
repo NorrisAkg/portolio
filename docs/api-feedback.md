@@ -151,16 +151,9 @@ Créer les routes d'API correspondantes (ex. `server/api/projects/index.get.ts`,
 
 ---
 
-## 8. Absence de l'endpoint pour le formulaire de contact (`POST /api/contact`)
+## 8. [RÉSOLU] Absence de l'endpoint pour le formulaire de contact (`POST /api/contact`)
 
-### Anomalie :
-La route `POST /api/contact` est manquante dans le backend pour traiter l'envoi de messages via Nodemailer.
-
-### Impact sur le Frontend :
-Le composant de contact ([app/components/ContactSection.vue](file:///home/norris/my-projects/portfolio/app/components/ContactSection.vue)) simule la soumission du message avec un délai de 400ms et une notification toast positive.
-
-### Solution recommandée pour le développeur :
-Créer le fichier `server/api/contact.post.ts` et configurer le module `nuxt-nodemailer` dans le backend pour relayer les courriels saisis.
+* **Résolu par** : Création de [server/api/contact.post.ts](file:///home/norris/my-projects/portfolio/server/api/contact.post.ts) avec `nodemailer` et câblage complet du composant frontend [app/components/ContactSection.vue](file:///home/norris/my-projects/portfolio/app/components/ContactSection.vue).
 
 
 
