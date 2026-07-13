@@ -1,7 +1,8 @@
-import type { PrismaClient } from '@prisma/client';
+import type { PrismaClient, Prisma } from '@prisma/client';
 import type { ProjectRepository, FindAllProjectsParams } from '../domain/project.repository';
 import type { Project } from '../domain/project.entity';
 import { ProjectMapper } from './project.mapper';
+import type { PrismaProjectWithTranslations } from './project.mapper';
 
 export class PrismaProjectRepository implements ProjectRepository {
   constructor(private readonly prisma: PrismaClient) {}
@@ -13,7 +14,7 @@ export class PrismaProjectRepository implements ProjectRepository {
     });
 
     if (!prismaProject) return null;
-    return ProjectMapper.toDomain(prismaProject as any);
+    return ProjectMapper.toDomain(prismaProject as PrismaProjectWithTranslations);
   }
 
   async findBySlug(slug: string): Promise<Project | null> {
@@ -27,12 +28,12 @@ export class PrismaProjectRepository implements ProjectRepository {
     });
 
     if (!prismaProject) return null;
-    return ProjectMapper.toDomain(prismaProject as any);
+    return ProjectMapper.toDomain(prismaProject as PrismaProjectWithTranslations);
   }
 
   async findAll(params: FindAllProjectsParams): Promise<Project[]> {
     const { featured } = params;
-    const where: any = {};
+    const where: Prisma.ProjectWhereInput = {};
     if (featured !== undefined) {
       where.featured = featured;
     }
@@ -43,7 +44,7 @@ export class PrismaProjectRepository implements ProjectRepository {
       orderBy: { createdAt: 'desc' },
     });
 
-    return prismaProjects.map(p => ProjectMapper.toDomain(p as any));
+    return prismaProjects.map(p => ProjectMapper.toDomain(p as PrismaProjectWithTranslations));
   }
 
   async save(project: Project): Promise<void> {

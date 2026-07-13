@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { slugify } from '../../../../shared/utils/slugify'
 
+import type { TechnologyProps } from '../../../../shared/types/project'
+
 definePageMeta({
   layout: 'admin',
   middleware: 'auth',
@@ -18,7 +20,7 @@ const liveUrl = ref('')
 const featured = ref(false)
 const selectedTechIds = ref<string[]>([])
 
-const { data: technologies } = await useFetch<any[]>('/api/technologies')
+const { data: technologies } = await useFetch<TechnologyProps[]>('/api/technologies')
 
 const activeFormTab = ref<'fr' | 'en'>('fr')
 
@@ -117,8 +119,9 @@ const handleSave = async () => {
     })
 
     router.push(localePath('/admin'))
-  } catch (err: any) {
-    errorMsg.value = err.data?.statusMessage || err.message || 'Une erreur est survenue lors de la création du projet'
+  } catch (err: unknown) {
+    const error = err as { data?: { statusMessage?: string }; message?: string }
+    errorMsg.value = error.data?.statusMessage || error.message || 'Une erreur est survenue lors de la création du projet'
   } finally {
     loading.value = false
   }
@@ -252,9 +255,9 @@ const handleSave = async () => {
             class="flex items-center gap-2 p-3 bg-slate-50 dark:bg-slate-900 border border-border rounded-lg cursor-pointer hover:border-orange/50 transition-colors select-none"
           >
             <input
+              v-model="selectedTechIds"
               type="checkbox"
               :value="tech.id"
-              v-model="selectedTechIds"
               class="rounded text-orange focus:ring-orange border-border"
             />
             <span class="text-xs text-navy dark:text-[#E8ECF5] font-medium">{{ tech.name }}</span>

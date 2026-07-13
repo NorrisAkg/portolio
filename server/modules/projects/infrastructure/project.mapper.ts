@@ -1,7 +1,7 @@
 import type { Project as PrismaProject, ProjectTranslation as PrismaProjectTranslation, Technology as PrismaTechnology } from '@prisma/client';
 import { Project } from '../domain/project.entity';
 
-type PrismaProjectWithTranslations = PrismaProject & {
+export type PrismaProjectWithTranslations = PrismaProject & {
   translations: PrismaProjectTranslation[];
   technologies?: PrismaTechnology[];
 };
