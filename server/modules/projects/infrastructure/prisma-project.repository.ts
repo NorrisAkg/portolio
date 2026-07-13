@@ -45,4 +45,90 @@ export class PrismaProjectRepository implements ProjectRepository {
 
     return prismaProjects.map(p => ProjectMapper.toDomain(p as any));
   }
+
+  async save(project: Project): Promise<void> {
+    const props = project.toJSON();
+
+    const techConnectDisconnect = props.technologies
+      ? {
+          set: props.technologies.map((t) => ({ id: t.id })),
+        }
+      : undefined;
+
+    await this.prisma.project.upsert({
+      where: { id: props.id },
+      update: {
+        image: props.image,
+        tone: props.tone,
+        year: props.year,
+        dur: props.dur,
+        githubUrl: props.githubUrl,
+        liveUrl: props.liveUrl,
+        featured: props.featured,
+        updatedAt: new Date(),
+        translations: {
+          upsert: props.translations.map(t => ({
+            where: {
+              projectId_locale: {
+                projectId: props.id,
+                locale: t.locale,
+              },
+            },
+            update: {
+              title: t.title,
+              slug: t.slug,
+              description: t.description,
+              content: t.content,
+              outcome: t.outcome,
+              durationLabel: t.durationLabel,
+            },
+            create: {
+              locale: t.locale,
+              title: t.title,
+              slug: t.slug,
+              description: t.description,
+              content: t.content,
+              outcome: t.outcome,
+              durationLabel: t.durationLabel,
+            },
+          })),
+        },
+        technologies: techConnectDisconnect,
+      },
+      create: {
+        id: props.id,
+        image: props.image,
+        tone: props.tone,
+        year: props.year,
+        dur: props.dur,
+        githubUrl: props.githubUrl,
+        liveUrl: props.liveUrl,
+        featured: props.featured,
+        createdAt: props.createdAt,
+        updatedAt: props.updatedAt,
+        translations: {
+          create: props.translations.map(t => ({
+            locale: t.locale,
+            title: t.title,
+            slug: t.slug,
+            description: t.description,
+            content: t.content,
+            outcome: t.outcome,
+            durationLabel: t.durationLabel,
+          })),
+        },
+        technologies: props.technologies
+          ? {
+              connect: props.technologies.map((t) => ({ id: t.id })),
+            }
+          : undefined,
+      },
+    });
+  }
+
+  async delete(id: string): Promise<void> {
+    await this.prisma.project.delete({
+      where: { id },
+    });
+  }
 }

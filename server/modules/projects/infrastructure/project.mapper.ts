@@ -1,8 +1,9 @@
-import type { Project as PrismaProject, ProjectTranslation as PrismaProjectTranslation } from '@prisma/client';
+import type { Project as PrismaProject, ProjectTranslation as PrismaProjectTranslation, Technology as PrismaTechnology } from '@prisma/client';
 import { Project } from '../domain/project.entity';
 
 type PrismaProjectWithTranslations = PrismaProject & {
   translations: PrismaProjectTranslation[];
+  technologies?: PrismaTechnology[];
 };
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
@@ -27,6 +28,12 @@ export class ProjectMapper {
         content: t.content,
         outcome: t.outcome,
         durationLabel: t.durationLabel,
+      })),
+      technologies: prismaProject.technologies?.map(t => ({
+        id: t.id,
+        name: t.name,
+        slug: t.slug,
+        icon: t.icon,
       })),
     });
   }

@@ -1,3 +1,5 @@
+import type { TechnologyProps } from '../../../../shared/types/project';
+
 export interface ProjectTranslationProps {
   locale: string;
   title: string;
@@ -20,6 +22,7 @@ export interface ProjectProps {
   createdAt: Date;
   updatedAt: Date;
   translations: ProjectTranslationProps[];
+  technologies?: TechnologyProps[];
 }
 
 export class Project {
@@ -41,6 +44,7 @@ export class Project {
   public get createdAt(): Date { return this.props.createdAt; }
   public get updatedAt(): Date { return this.props.updatedAt; }
   public get translations(): ProjectTranslationProps[] { return this.props.translations; }
+  public get technologies(): TechnologyProps[] | undefined { return this.props.technologies; }
 
   public toJSON(): ProjectProps {
     return { ...this.props };

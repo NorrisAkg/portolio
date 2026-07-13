@@ -57,13 +57,41 @@ const handlePublish = async (id: string) => {
 }
 
 const { getProjectsList } = useProjects()
-const { projects: realProjects } = await getProjectsList()
+const { projects: realProjects, refresh: refreshProjects } = await getProjectsList()
 const mockProjects = computed(() => realProjects.value.map(p => ({
   id: p.id,
   name: p.name,
   year: p.year,
   status: p.featured ? 'FEATURED' : 'ACTIVE',
 })))
+
+// Project Deletion Dialog State
+const projectToDelete = ref<{ id: string; name: string } | null>(null)
+const isDeletingProject = ref(false)
+
+const confirmDeleteProject = (id: string, name: string) => {
+  projectToDelete.value = { id, name }
+}
+
+const cancelDeleteProject = () => {
+  projectToDelete.value = null
+}
+
+const handleDeleteProject = async () => {
+  if (!projectToDelete.value) return
+  isDeletingProject.value = true
+  try {
+    await $fetch(`/api/projects/${projectToDelete.value.id}`, {
+      method: 'DELETE',
+    })
+    await refreshProjects()
+    projectToDelete.value = null
+  } catch {
+    alert('Erreur lors de la suppression du projet.')
+  } finally {
+    isDeletingProject.value = false
+  }
+}
 </script>
 
 <template>
@@ -81,6 +109,13 @@ const mockProjects = computed(() => realProjects.value.map(p => ({
           class="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-orange text-slate-950 text-sm font-semibold hover:bg-orange/90 transition-colors"
         >
           <span>+</span> Nouveau Blog
+        </NuxtLink>
+        <NuxtLink
+          v-else-if="activeTab === 'projects'"
+          :to="localePath('/admin/projects/create')"
+          class="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-orange text-slate-950 text-sm font-semibold hover:bg-orange/90 transition-colors"
+        >
+          <span>+</span> Nouveau Projet
         </NuxtLink>
       </div>
     </div>
@@ -230,8 +265,15 @@ const mockProjects = computed(() => realProjects.value.map(p => ({
                   {{ p.status }}
                 </span>
               </td>
-              <td class="p-4 text-right pr-6">
+              <td class="p-4 text-right pr-6 space-x-2">
                 <button disabled class="opacity-30 inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-500/10 text-slate-500 cursor-not-allowed">✏️</button>
+                <button
+                  title="Supprimer"
+                  class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 transition-colors"
+                  @click="confirmDeleteProject(p.id, p.name)"
+                >
+                  🗑️
+                </button>
               </td>
             </tr>
           </tbody>
@@ -260,6 +302,33 @@ const mockProjects = computed(() => realProjects.value.map(p => ({
             @click="handleDelete"
           >
             <span v-if="isDeleting" class="animate-spin rounded-full h-3 w-3 border-2 border-white border-t-transparent"></span>
+            Supprimer
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confirm Delete Project Modal -->
+    <div v-if="projectToDelete" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
+      <div class="bg-white dark:bg-[#0A0F1A] border border-border p-6 rounded-2xl max-w-md w-full shadow-2xl space-y-4">
+        <h3 class="font-['Montserrat'] font-bold text-lg text-navy dark:text-white m-0">Confirmer la suppression</h3>
+        <p class="text-sm text-muted">
+          Êtes-vous sûr de vouloir supprimer le projet <strong class="text-navy dark:text-white">"{{ projectToDelete.name }}"</strong> ? Cette action est irréversible.
+        </p>
+        <div class="flex justify-end gap-3 pt-2">
+          <button
+            :disabled="isDeletingProject"
+            class="h-9 px-4 rounded-lg border border-border text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors"
+            @click="cancelDeleteProject"
+          >
+            Annuler
+          </button>
+          <button
+            :disabled="isDeletingProject"
+            class="h-9 px-4 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold transition-colors flex items-center gap-1.5"
+            @click="handleDeleteProject"
+          >
+            <span v-if="isDeletingProject" class="animate-spin rounded-full h-3 w-3 border-2 border-white border-t-transparent"></span>
             Supprimer
           </button>
         </div>

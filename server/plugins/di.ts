@@ -11,6 +11,8 @@ import { DeleteArticleUseCase } from '../modules/articles/application/delete-art
 import { PrismaProjectRepository } from '../modules/projects/infrastructure/prisma-project.repository';
 import { ListProjectsUseCase } from '../modules/projects/application/list-projects.use-case';
 import { GetProjectUseCase } from '../modules/projects/application/get-project.use-case';
+import { CreateProjectUseCase } from '../modules/projects/application/create-project.use-case';
+import { DeleteProjectUseCase } from '../modules/projects/application/delete-project.use-case';
 
 export default defineNitroPlugin(() => {
   // Repositories
@@ -30,6 +32,8 @@ export default defineNitroPlugin(() => {
 
   container.register('ListProjectsUseCase', new ListProjectsUseCase(projectRepository));
   container.register('GetProjectUseCase', new GetProjectUseCase(projectRepository));
+  container.register('CreateProjectUseCase', new CreateProjectUseCase(projectRepository));
+  container.register('DeleteProjectUseCase', new DeleteProjectUseCase(projectRepository));
 
   console.log('[DI] Dependencies registered.');
 });
