@@ -3,6 +3,12 @@ const { user, logout } = useAuth()
 const localePath = useLocalePath()
 const router = useRouter()
 
+const colorMode = useColorMode()
+const isDark = computed(() => colorMode.value === 'dark')
+const toggleDark = () => {
+  colorMode.preference = isDark.value ? 'light' : 'dark'
+}
+
 const handleLogout = async () => {
   await logout()
   router.push(localePath('/admin/login'))
@@ -29,6 +35,16 @@ const handleLogout = async () => {
         <span v-if="user" class="text-xs text-muted max-sm:hidden">
           {{ user.email }}
         </span>
+
+        <!-- Theme Toggle -->
+        <button
+          class="inline-flex items-center justify-center gap-1.5 h-8 rounded-lg px-2.5 bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 border border-border text-xs text-[#2D2D2D] dark:text-[#E8EAEE] font-medium transition-colors"
+          :aria-label="isDark ? 'Mode clair' : 'Mode sombre'"
+          @click="toggleDark"
+        >
+          <AppIcon :name="isDark ? 'sun' : 'moon'" class="w-3.5 h-3.5" />
+          <span class="max-sm:hidden">{{ isDark ? 'Sombre' : 'Clair' }}</span>
+        </button>
 
         <!-- Quick navigation -->
         <NuxtLink :to="localePath('/')" class="inline-flex items-center gap-1.5 text-xs font-medium hover:text-orange transition-colors">
