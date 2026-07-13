@@ -1,20 +1,22 @@
 import 'dotenv/config'
 import { prisma } from '../server/shared/prisma'
+import bcrypt from 'bcryptjs'
 
 async function main() {
   console.log('Start seeding...')
   
-  // Seed admin user (password: password123, you should change this in production!)
-  // Note: in a real app, this should be a bcrypt hashed password. We'll add a plain string here 
-  // and the auth service should hash/compare it, but for seed we'll assume bcrypt hashes it.
-  // To avoid installing bcrypt just for the seed, we'll just put a dummy hash.
-  // '$2a$12$R9h/cIPz0gi.URNNX3kh2OPST9/PgBkqquzi.Ss7KIUgO2t0jWMUW' is 'password123'
+  const adminEmail = process.env.ADMIN_EMAIL || 'admin@portfolio.local'
+  const adminPassword = process.env.ADMIN_PASSWORD || 'password123'
+  const adminHash = await bcrypt.hash(adminPassword, 10)
+
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@portfolio.local' },
-    update: {},
+    where: { email: adminEmail },
+    update: {
+      password: adminHash,
+    },
     create: {
-      email: 'admin@portfolio.local',
-      password: '$2a$12$R9h/cIPz0gi.URNNX3kh2OPST9/PgBkqquzi.Ss7KIUgO2t0jWMUW', 
+      email: adminEmail,
+      password: adminHash,
     },
   })
   

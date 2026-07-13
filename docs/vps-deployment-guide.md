@@ -145,6 +145,11 @@ Le portfolio utilise PostgreSQL pour persister les articles de blog, les projets
    SMTP_PASS="votre_mot_de_passe"
    SMTP_FROM="noreply@votredomaine.com"
    SMTP_TO="norris@votredomaine.com"
+
+   # Identifiants de l'administrateur initial lors du seeding (Créé en base de données)
+   # Après l'exécution du script de seeding à l'étape 5, vous pourrez supprimer ces deux lignes de votre .env
+   ADMIN_EMAIL="admin@votredomaine.com"
+   ADMIN_PASSWORD="mot_de_passe_admin_tres_securise"
    ```
    *(Pour enregistrer et quitter `nano`, appuyez sur `Ctrl+O`, `Entrée`, puis `Ctrl+X`).*
 
