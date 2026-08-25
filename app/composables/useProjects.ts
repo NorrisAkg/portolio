@@ -1,9 +1,24 @@
-import type { ProjectProps } from '../../shared/types/project'
+export interface MappedProject {
+  id: string
+  name: string
+  year: string
+  dur: string
+  problem: string
+  bullets: [string, string][]
+  tone: 'warm' | 'cool' | 'navy'
+  label?: string
+  githubUrl?: string | null
+  liveUrl?: string | null
+  slug: string
+  featured: boolean
+  status: 'DRAFT' | 'PUBLISHED'
+  publishedAt?: string | null
+}
 
 export const useProjects = () => {
   const { locale } = useI18n()
 
-  const mapProject = (p: ProjectProps) => {
+  const mapProject = (p: ProjectProps): MappedProject => {
     const trans = p.translations.find(t => t.locale === locale.value) || p.translations[0] || {
       title: '',
       slug: '',
@@ -25,7 +40,7 @@ export const useProjects = () => {
         ['OUTCOME', trans.outcome],
         ['DURATION', trans.durationLabel],
       ] as [string, string][],
-      tone: p.tone,
+      tone: (p.tone as 'warm' | 'cool' | 'navy') || 'cool',
       label: p.image || undefined,
       githubUrl: p.githubUrl,
       liveUrl: p.liveUrl,
