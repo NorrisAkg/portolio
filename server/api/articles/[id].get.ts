@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
     const params = await getValidatedRouterParams(event, (data) => paramsSchema.parse(data));
     
     const useCase = useContainer().resolve<GetArticleUseCase>('GetArticleUseCase');
-    const article = await useCase.execute({ slug: params.id });
+    const article = await useCase.execute({ id: params.id, slug: params.id });
 
     // Only admins can see DRAFT articles
     if (article.status === 'DRAFT') {

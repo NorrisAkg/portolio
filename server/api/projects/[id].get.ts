@@ -4,7 +4,7 @@ import { handleDomainError } from '../../utils/handle-errors';
 import { useContainer } from '../../utils/use-container';
 
 const paramsSchema = z.object({
-  slug: z.string(),
+  id: z.string(),
 });
 
 export default defineEventHandler(async (event) => {
@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
     const params = await getValidatedRouterParams(event, (data) => paramsSchema.parse(data));
     
     const useCase = useContainer().resolve<GetProjectUseCase>('GetProjectUseCase');
-    const project = await useCase.execute({ slug: params.slug });
+    const project = await useCase.execute({ id: params.id, slug: params.id });
 
     return project.toJSON();
   } catch (error) {
