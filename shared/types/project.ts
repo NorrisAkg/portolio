@@ -24,6 +24,8 @@ export interface ProjectProps {
   githubUrl: string | null;
   liveUrl: string | null;
   featured: boolean;
+  status: 'DRAFT' | 'PUBLISHED';
+  publishedAt: string | null;
   createdAt: string;
   updatedAt: string;
   translations: ProjectTranslationProps[];

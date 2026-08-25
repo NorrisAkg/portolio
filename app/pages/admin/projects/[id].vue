@@ -1,49 +1,61 @@
 <script setup lang="ts">
 import { slugify } from '../../../../shared/utils/slugify'
-
-import type { TechnologyProps } from '../../../../shared/types/project'
+import type { ProjectProps, TechnologyProps } from '../../../../shared/types/project'
 
 definePageMeta({
   layout: 'admin',
   middleware: 'auth',
 })
 
+const route = useRoute()
 const localePath = useLocalePath()
 const router = useRouter()
 
-const year = ref('')
-const dur = ref('')
-const tone = ref<'warm' | 'cool' | 'navy'>('cool')
-const image = ref('')
-const githubUrl = ref('')
-const liveUrl = ref('')
-const featured = ref(false)
-const selectedTechIds = ref<string[]>([])
+const idParam = computed(() => route.params.id as string)
+
+// Fetch raw project including all translations & technologies
+const { data: rawProject, error: fetchError } = await useFetch<ProjectProps>(`/api/projects/${idParam.value}`)
+
+if (fetchError.value || !rawProject.value) {
+  throw createError({ statusCode: 404, statusMessage: 'Projet introuvable', fatal: true })
+}
 
 const { data: technologies } = await useFetch<TechnologyProps[]>('/api/technologies')
 
+const year = ref(rawProject.value.year || '')
+const dur = ref(rawProject.value.dur || '')
+const tone = ref<'warm' | 'cool' | 'navy'>((rawProject.value.tone as 'warm' | 'cool' | 'navy') || 'cool')
+const image = ref(rawProject.value.image || '')
+const githubUrl = ref(rawProject.value.githubUrl || '')
+const liveUrl = ref(rawProject.value.liveUrl || '')
+const featured = ref(rawProject.value.featured || false)
+const selectedTechIds = ref<string[]>(rawProject.value.technologies?.map(t => t.id) || [])
+
 const activeFormTab = ref<'fr' | 'en'>('fr')
 
+const frTranslation = rawProject.value.translations.find(t => t.locale === 'fr')
+const enTranslation = rawProject.value.translations.find(t => t.locale === 'en')
+
 const frForm = ref({
-  title: '',
-  slug: '',
-  description: '',
-  content: '',
-  outcome: '',
-  durationLabel: '',
+  title: frTranslation?.title || '',
+  slug: frTranslation?.slug || '',
+  description: frTranslation?.description || '',
+  content: frTranslation?.content || '',
+  outcome: frTranslation?.outcome || '',
+  durationLabel: frTranslation?.durationLabel || '',
 })
 
 const enForm = ref({
-  title: '',
-  slug: '',
-  description: '',
-  content: '',
-  outcome: '',
-  durationLabel: '',
+  title: enTranslation?.title || '',
+  slug: enTranslation?.slug || '',
+  description: enTranslation?.description || '',
+  content: enTranslation?.content || '',
+  outcome: enTranslation?.outcome || '',
+  durationLabel: enTranslation?.durationLabel || '',
 })
 
-const isFrSlugAuto = ref(true)
-const isEnSlugAuto = ref(true)
+const isFrSlugAuto = ref(frForm.value.slug === '')
+const isEnSlugAuto = ref(enForm.value.slug === '')
 
 // Watch title to auto-generate slug
 watch(() => frForm.value.title, (newVal) => {
@@ -73,7 +85,6 @@ const handleSave = async () => {
   errorMsg.value = ''
   loading.value = true
 
-  // Fallback copies to prevent empty data for second language if user only filled one
   const hasFr = frForm.value.title.trim() !== ''
   const hasEn = enForm.value.title.trim() !== ''
 
@@ -113,16 +124,39 @@ const handleSave = async () => {
       technologyIds: selectedTechIds.value,
     }
 
-    await $fetch('/api/projects', {
-      method: 'POST',
+    await $fetch(`/api/projects/${idParam.value}`, {
+      method: 'PATCH',
       body: payload,
     })
 
     router.push(localePath('/admin'))
   } catch (err: unknown) {
-    errorMsg.value = formatApiError(err, 'Une erreur est survenue lors de la création du projet')
+    errorMsg.value = formatApiError(err, 'Une erreur est survenue lors de la mise à jour du projet')
   } finally {
     loading.value = false
+  }
+}
+
+const currentStatus = ref(rawProject.value?.status || 'DRAFT')
+const isTogglingStatus = ref(false)
+
+const handleTogglePublish = async () => {
+  const projectId = rawProject.value?.id
+  if (!projectId) return
+
+  isTogglingStatus.value = true
+  try {
+    if (currentStatus.value === 'PUBLISHED') {
+      await $fetch(`/api/projects/${projectId}/unpublish`, { method: 'POST' })
+      currentStatus.value = 'DRAFT'
+    } else {
+      await $fetch(`/api/projects/${projectId}/publish`, { method: 'POST' })
+      currentStatus.value = 'PUBLISHED'
+    }
+  } catch (err: unknown) {
+    errorMsg.value = formatApiError(err, 'Erreur lors du changement de statut')
+  } finally {
+    isTogglingStatus.value = false
   }
 }
 </script>
@@ -130,13 +164,37 @@ const handleSave = async () => {
 <template>
   <div class="space-y-8 max-w-4xl mx-auto">
     <!-- Breadcrumb & Title -->
-    <div class="space-y-2 border-b border-border pb-5">
-      <nav class="flex items-center gap-2 font-['JetBrains_Mono'] text-[10px] tracking-[0.1em] uppercase text-muted" aria-label="breadcrumb">
-        <NuxtLink :to="localePath('/admin')" class="hover:text-orange transition-colors">Dashboard</NuxtLink>
-        <span class="text-border">/</span>
-        <span class="text-navy dark:text-white">Créer un projet</span>
-      </nav>
-      <h1 class="font-['Montserrat'] font-bold text-3xl tracking-tight text-navy dark:text-white m-0">Créer un projet</h1>
+    <div class="flex items-center justify-between border-b border-border pb-5">
+      <div class="space-y-2">
+        <nav class="flex items-center gap-2 font-['JetBrains_Mono'] text-[10px] tracking-[0.1em] uppercase text-muted" aria-label="breadcrumb">
+          <NuxtLink :to="localePath('/admin')" class="hover:text-orange transition-colors">Dashboard</NuxtLink>
+          <span class="text-border">/</span>
+          <span class="text-navy dark:text-white">Modifier le projet</span>
+        </nav>
+        <div class="flex items-center gap-3">
+          <h1 class="font-['Montserrat'] font-bold text-3xl tracking-tight text-navy dark:text-white m-0">Modifier le projet</h1>
+          <span
+            class="text-[10px] font-bold px-2.5 py-1 rounded uppercase tracking-wider"
+            :class="currentStatus === 'PUBLISHED' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'"
+          >
+            {{ currentStatus === 'PUBLISHED' ? 'Publié' : 'Brouillon' }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Quick toggle status button -->
+      <button
+        type="button"
+        :disabled="isTogglingStatus"
+        class="h-9 px-4 rounded-lg text-xs font-semibold flex items-center gap-2 transition-all border"
+        :class="currentStatus === 'PUBLISHED'
+          ? 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30'
+          : 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'"
+        @click="handleTogglePublish"
+      >
+        <span v-if="isTogglingStatus" class="animate-spin rounded-full h-3.5 w-3.5 border-2 border-current border-t-transparent"></span>
+        <span>{{ currentStatus === 'PUBLISHED' ? '🔒 Dépublier (Passer en brouillon)' : '🌐 Publier le projet' }}</span>
+      </button>
     </div>
 
     <!-- Main Form -->
@@ -214,49 +272,49 @@ const handleSave = async () => {
 
           <!-- Live URL -->
           <div class="flex flex-col gap-1.5">
-            <label for="liveUrl" class="text-xs tracking-wider uppercase text-muted font-medium">URL Démo Live (Optionnel)</label>
+            <label for="liveUrl" class="text-xs tracking-wider uppercase text-muted font-medium">URL Démo / Production (Optionnel)</label>
             <input
               id="liveUrl"
               v-model="liveUrl"
               type="url"
-              placeholder="https://project.live"
+              placeholder="https://myproject.com"
               class="h-10 px-3 bg-slate-50 dark:bg-slate-900 border border-border rounded-lg text-sm text-navy dark:text-[#E8ECF5] focus:outline-none focus:border-orange transition-colors"
             />
           </div>
         </div>
 
-        <!-- Featured -->
-        <div class="flex items-center gap-3 pt-2">
+        <!-- Featured checkbox -->
+        <div class="flex items-center gap-2 pt-2">
           <input
             id="featured"
             v-model="featured"
             type="checkbox"
-            class="h-4 w-4 rounded border-border text-orange focus:ring-orange bg-slate-50 dark:bg-slate-900"
+            class="w-4 h-4 rounded border-border text-orange focus:ring-orange accent-orange"
           />
-          <label for="featured" class="text-xs tracking-wider uppercase text-muted font-semibold cursor-pointer select-none">Mettre en avant ce projet sur la page d'accueil</label>
+          <label for="featured" class="text-sm font-medium text-navy dark:text-[#E8ECF5] cursor-pointer">
+            Mettre en avant sur la page d'accueil (Featured)
+          </label>
         </div>
       </div>
 
-      <!-- Technologies -->
+      <!-- Technologies Selection -->
       <div class="bg-white dark:bg-[#0A0F1A] border border-border p-6 rounded-2xl shadow-sm space-y-4">
-        <h2 class="font-['Montserrat'] font-bold text-base text-navy dark:text-white m-0">Technologies associées</h2>
-        <div v-if="technologies && technologies.length" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+        <h2 class="font-['Montserrat'] font-bold text-base text-navy dark:text-white m-0">Technologies utilisées</h2>
+        <div class="flex flex-wrap gap-2">
           <label
             v-for="tech in technologies"
             :key="tech.id"
-            class="flex items-center gap-2 p-3 bg-slate-50 dark:bg-slate-900 border border-border rounded-lg cursor-pointer hover:border-orange/50 transition-colors select-none"
+            class="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs cursor-pointer transition-colors"
+            :class="selectedTechIds.includes(tech.id) ? 'border-orange bg-orange/10 text-orange font-semibold' : 'border-border bg-slate-50 dark:bg-slate-900 text-muted hover:border-slate-400'"
           >
             <input
               v-model="selectedTechIds"
               type="checkbox"
               :value="tech.id"
-              class="rounded text-orange focus:ring-orange border-border"
+              class="hidden"
             />
-            <span class="text-xs text-navy dark:text-[#E8ECF5] font-medium">{{ tech.name }}</span>
+            <span>{{ tech.name }}</span>
           </label>
-        </div>
-        <div v-else class="text-xs text-muted">
-          Chargement des technologies...
         </div>
       </div>
 
@@ -268,7 +326,7 @@ const handleSave = async () => {
             type="button"
             class="h-12 px-6 text-xs uppercase tracking-wider font-bold border-r border-border transition-colors flex items-center gap-2"
             :class="activeFormTab === 'fr' ? 'bg-white dark:bg-[#0A0F1A] text-orange border-b-2 border-b-orange' : 'text-muted hover:text-navy'"
-            @click="activeFormTab = 'fr'"
+            @click="activeFormTab === 'fr'"
           >
             🇫🇷 Français
           </button>
@@ -276,7 +334,7 @@ const handleSave = async () => {
             type="button"
             class="h-12 px-6 text-xs uppercase tracking-wider font-bold border-r border-border transition-colors flex items-center gap-2"
             :class="activeFormTab === 'en' ? 'bg-white dark:bg-[#0A0F1A] text-orange border-b-2 border-b-orange' : 'text-muted hover:text-navy'"
-            @click="activeFormTab = 'en'"
+            @click="activeFormTab === 'en'"
           >
             🇺🇸 English
           </button>
@@ -287,7 +345,7 @@ const handleSave = async () => {
           <!-- FR FIELDS -->
           <div v-show="activeFormTab === 'fr'" class="space-y-5">
             <div class="flex flex-col gap-1.5">
-              <label for="fr-title" class="text-xs tracking-wider uppercase text-muted font-medium">Titre du Projet</label>
+              <label for="fr-title" class="text-xs tracking-wider uppercase text-muted font-medium">Titre du projet (FR)</label>
               <input
                 id="fr-title"
                 v-model="frForm.title"
@@ -303,54 +361,52 @@ const handleSave = async () => {
                 id="fr-slug"
                 v-model="frForm.slug"
                 type="text"
-                placeholder="agricultural-marketplace-bj"
+                placeholder="marketplace-agricole-benin"
                 class="h-10 px-3 bg-slate-50 dark:bg-slate-900 border border-border rounded-lg text-sm text-navy dark:text-[#E8ECF5] focus:outline-none focus:border-orange transition-colors"
                 @input="handleFrSlugInput"
               />
             </div>
 
             <div class="flex flex-col gap-1.5">
-              <label for="fr-desc" class="text-xs tracking-wider uppercase text-muted font-medium">Description (Problème)</label>
+              <label for="fr-outcome" class="text-xs tracking-wider uppercase text-muted font-medium">Outcome / Résultat clé (FR)</label>
+              <input
+                id="fr-outcome"
+                v-model="frForm.outcome"
+                type="text"
+                placeholder="+38% marge moyenne"
+                class="h-10 px-3 bg-slate-50 dark:bg-slate-900 border border-border rounded-lg text-sm text-navy dark:text-[#E8ECF5] focus:outline-none focus:border-orange transition-colors"
+              />
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <label for="fr-durationLabel" class="text-xs tracking-wider uppercase text-muted font-medium">Libellé complet de la durée (FR)</label>
+              <input
+                id="fr-durationLabel"
+                v-model="frForm.durationLabel"
+                type="text"
+                placeholder="8 semaines · MVP → production"
+                class="h-10 px-3 bg-slate-50 dark:bg-slate-900 border border-border rounded-lg text-sm text-navy dark:text-[#E8ECF5] focus:outline-none focus:border-orange transition-colors"
+              />
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <label for="fr-desc" class="text-xs tracking-wider uppercase text-muted font-medium">Description / Problème (FR)</label>
               <textarea
                 id="fr-desc"
                 v-model="frForm.description"
                 rows="3"
-                placeholder="Résumé du problème business résolu par le projet..."
+                placeholder="Plateforme de mise en relation directe producteurs-acheteurs..."
                 class="p-3 bg-slate-50 dark:bg-slate-900 border border-border rounded-lg text-sm text-navy dark:text-[#E8ECF5] focus:outline-none focus:border-orange transition-colors resize-none"
               ></textarea>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div class="flex flex-col gap-1.5">
-                <label for="fr-outcome" class="text-xs tracking-wider uppercase text-muted font-medium">Résultat (Outcome)</label>
-                <input
-                  id="fr-outcome"
-                  v-model="frForm.outcome"
-                  type="text"
-                  placeholder="+38% de marge moyenne pour les producteurs"
-                  class="h-10 px-3 bg-slate-50 dark:bg-slate-900 border border-border rounded-lg text-sm text-navy dark:text-[#E8ECF5] focus:outline-none focus:border-orange transition-colors"
-                />
-              </div>
-
-              <div class="flex flex-col gap-1.5">
-                <label for="fr-durationLabel" class="text-xs tracking-wider uppercase text-muted font-medium">Libellé de durée détaillé</label>
-                <input
-                  id="fr-durationLabel"
-                  v-model="frForm.durationLabel"
-                  type="text"
-                  placeholder="8 semaines · MVP → production"
-                  class="h-10 px-3 bg-slate-50 dark:bg-slate-900 border border-border rounded-lg text-sm text-navy dark:text-[#E8ECF5] focus:outline-none focus:border-orange transition-colors"
-                />
-              </div>
-            </div>
-
             <div class="flex flex-col gap-1.5">
-              <label for="fr-content" class="text-xs tracking-wider uppercase text-muted font-medium">Description détaillée (Markdown)</label>
+              <label for="fr-content" class="text-xs tracking-wider uppercase text-muted font-medium">Étude de cas détaillée (Markdown FR)</label>
               <textarea
                 id="fr-content"
                 v-model="frForm.content"
-                rows="12"
-                placeholder="Rédigez la description détaillée en Markdown. Utilisez ## pour les titres, * pour le gras, etc."
+                rows="8"
+                placeholder="Détails de l'architecture, défis relevés et solutions techniques..."
                 class="p-3 bg-slate-50 dark:bg-slate-900 border border-border rounded-lg text-sm text-navy dark:text-[#E8ECF5] font-mono focus:outline-none focus:border-orange transition-colors"
               ></textarea>
             </div>
@@ -359,70 +415,68 @@ const handleSave = async () => {
           <!-- EN FIELDS -->
           <div v-show="activeFormTab === 'en'" class="space-y-5">
             <div class="flex flex-col gap-1.5">
-              <label for="en-title" class="text-xs tracking-wider uppercase text-muted font-medium">Project Title</label>
+              <label for="en-title" class="text-xs tracking-wider uppercase text-muted font-medium">Project Title (EN)</label>
               <input
                 id="en-title"
                 v-model="enForm.title"
                 type="text"
-                placeholder="Agricultural marketplace — Benin"
+                placeholder="Agricultural Marketplace — Benin"
                 class="h-10 px-3 bg-slate-50 dark:bg-slate-900 border border-border rounded-lg text-sm text-navy dark:text-[#E8ECF5] focus:outline-none focus:border-orange transition-colors"
               />
             </div>
 
             <div class="flex flex-col gap-1.5">
-              <label for="en-slug" class="text-xs tracking-wider uppercase text-muted font-medium">URL Slug</label>
+              <label for="en-slug" class="text-xs tracking-wider uppercase text-muted font-medium">URL Slug (EN)</label>
               <input
                 id="en-slug"
                 v-model="enForm.slug"
                 type="text"
-                placeholder="agricultural-marketplace-en"
+                placeholder="agricultural-marketplace-benin"
                 class="h-10 px-3 bg-slate-50 dark:bg-slate-900 border border-border rounded-lg text-sm text-navy dark:text-[#E8ECF5] focus:outline-none focus:border-orange transition-colors"
                 @input="handleEnSlugInput"
               />
             </div>
 
             <div class="flex flex-col gap-1.5">
-              <label for="en-desc" class="text-xs tracking-wider uppercase text-muted font-medium">Description (Problem)</label>
+              <label for="en-outcome" class="text-xs tracking-wider uppercase text-muted font-medium">Outcome / Key Result (EN)</label>
+              <input
+                id="en-outcome"
+                v-model="enForm.outcome"
+                type="text"
+                placeholder="+38% average margin"
+                class="h-10 px-3 bg-slate-50 dark:bg-slate-900 border border-border rounded-lg text-sm text-navy dark:text-[#E8ECF5] focus:outline-none focus:border-orange transition-colors"
+              />
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <label for="en-durationLabel" class="text-xs tracking-wider uppercase text-muted font-medium">Duration Label (EN)</label>
+              <input
+                id="en-durationLabel"
+                v-model="enForm.durationLabel"
+                type="text"
+                placeholder="8 weeks · MVP → production"
+                class="h-10 px-3 bg-slate-50 dark:bg-slate-900 border border-border rounded-lg text-sm text-navy dark:text-[#E8ECF5] focus:outline-none focus:border-orange transition-colors"
+              />
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <label for="en-desc" class="text-xs tracking-wider uppercase text-muted font-medium">Description / Problem (EN)</label>
               <textarea
                 id="en-desc"
                 v-model="enForm.description"
                 rows="3"
-                placeholder="Short summary of the problem solved..."
+                placeholder="Direct connecting platform for producers and buyers..."
                 class="p-3 bg-slate-50 dark:bg-slate-900 border border-border rounded-lg text-sm text-navy dark:text-[#E8ECF5] focus:outline-none focus:border-orange transition-colors resize-none"
               ></textarea>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div class="flex flex-col gap-1.5">
-                <label for="en-outcome" class="text-xs tracking-wider uppercase text-muted font-medium">Outcome</label>
-                <input
-                  id="en-outcome"
-                  v-model="enForm.outcome"
-                  type="text"
-                  placeholder="+38% average margin for producers"
-                  class="h-10 px-3 bg-slate-50 dark:bg-slate-900 border border-border rounded-lg text-sm text-navy dark:text-[#E8ECF5] focus:outline-none focus:border-orange transition-colors"
-                />
-              </div>
-
-              <div class="flex flex-col gap-1.5">
-                <label for="en-durationLabel" class="text-xs tracking-wider uppercase text-muted font-medium">Detailed Duration Label</label>
-                <input
-                  id="en-durationLabel"
-                  v-model="enForm.durationLabel"
-                  type="text"
-                  placeholder="8 weeks · MVP → production"
-                  class="h-10 px-3 bg-slate-50 dark:bg-slate-900 border border-border rounded-lg text-sm text-navy dark:text-[#E8ECF5] focus:outline-none focus:border-orange transition-colors"
-                />
-              </div>
-            </div>
-
             <div class="flex flex-col gap-1.5">
-              <label for="en-content" class="text-xs tracking-wider uppercase text-muted font-medium">Detailed Content (Markdown)</label>
+              <label for="en-content" class="text-xs tracking-wider uppercase text-muted font-medium">Detailed Case Study (Markdown EN)</label>
               <textarea
                 id="en-content"
                 v-model="enForm.content"
-                rows="12"
-                placeholder="Write the detailed writeup in Markdown..."
+                rows="8"
+                placeholder="Architecture details, challenges overcome and tech solutions..."
                 class="p-3 bg-slate-50 dark:bg-slate-900 border border-border rounded-lg text-sm text-navy dark:text-[#E8ECF5] font-mono focus:outline-none focus:border-orange transition-colors"
               ></textarea>
             </div>
@@ -444,7 +498,7 @@ const handleSave = async () => {
           class="h-10 px-5 rounded-lg bg-orange text-slate-950 text-sm font-semibold hover:bg-orange/90 transition-colors disabled:opacity-50 flex items-center gap-1.5"
         >
           <span v-if="loading" class="animate-spin rounded-full h-4 w-4 border-2 border-slate-950 border-t-transparent"></span>
-          Enregistrer le projet
+          Enregistrer les modifications
         </button>
       </div>
     </form>

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { PublishArticleUseCase } from '../../../modules/articles/application/publish-article.use-case';
+import type { UnpublishArticleUseCase } from '../../../modules/articles/application/unpublish-article.use-case';
 import { handleDomainError } from '../../../utils/handle-errors';
 import { useContainer } from '../../../utils/use-container';
 
@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
     
     const params = await getValidatedRouterParams(event, (data) => paramsSchema.parse(data));
     
-    const useCase = useContainer().resolve<PublishArticleUseCase>('PublishArticleUseCase');
+    const useCase = useContainer().resolve<UnpublishArticleUseCase>('UnpublishArticleUseCase');
     const article = await useCase.execute({ id: params.id });
 
     return article.toJSON();
@@ -21,6 +21,6 @@ export default defineEventHandler(async (event) => {
     if (error instanceof z.ZodError) {
       throw createError({ statusCode: 400, statusMessage: 'Bad Request', data: error.issues });
     }
-    handleDomainError(error, event);
+    return handleDomainError(error, event);
   }
 });

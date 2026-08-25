@@ -6,42 +6,25 @@ export const useAuth = () => {
 
   const fetchMe = async () => {
     try {
-      // TODO: replace with real useFetch/ $fetch to '/api/auth/me' in Phase 3
-      if (import.meta.client) {
-        const cached = localStorage.getItem('admin-user')
-        if (cached) {
-          user.value = JSON.parse(cached)
-        }
-      }
+      const fetcher = useRequestFetch()
+      const data = await fetcher<AdminUser | null>('/api/auth/me')
+      user.value = data
+      return data
     } catch {
       user.value = null
+      return null
     }
   }
 
   const login = async (email: string, password: string) => {
     loading.value = true
     try {
-      // TODO: replace with real POST '/api/auth/login' call in Phase 3
-      // const response = await $fetch<AdminUser>('/api/auth/login', {
-      //   method: 'POST',
-      //   body: { email, password }
-      // })
-      // user.value = response
-      
-      // Temporary mockup for client-side testing
-      if (email === 'admin@portfolio.local' && password === 'password123') {
-        const mockUser: AdminUser = {
-          id: 'seed-admin-id',
-          email,
-          createdAt: new Date().toISOString(),
-        }
-        user.value = mockUser
-        if (import.meta.client) {
-          localStorage.setItem('admin-user', JSON.stringify(mockUser))
-        }
-        return true
-      }
-      throw new Error('Identifiants incorrects')
+      const response = await $fetch<{ user: AdminUser }>('/api/auth/login', {
+        method: 'POST',
+        body: { email, password },
+      })
+      user.value = response.user
+      return true
     } finally {
       loading.value = false
     }
@@ -50,13 +33,11 @@ export const useAuth = () => {
   const logout = async () => {
     loading.value = true
     try {
-      // TODO: replace with real POST '/api/auth/logout' call in Phase 3
-      // await $fetch('/api/auth/logout', { method: 'POST' })
-      user.value = null
-      if (import.meta.client) {
-        localStorage.removeItem('admin-user')
-      }
+      await $fetch('/api/auth/logout', { method: 'POST' })
+    } catch {
+      // ignore
     } finally {
+      user.value = null
       loading.value = false
     }
   }

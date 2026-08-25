@@ -26,7 +26,7 @@ const handleLogin = async () => {
       router.push(localePath('/admin'))
     }
   } catch (err: any) {
-    errorMsg.value = err.message || 'Une erreur est survenue lors de la connexion'
+    errorMsg.value = formatApiError(err, 'Une erreur est survenue lors de la connexion')
   }
 }
 </script>

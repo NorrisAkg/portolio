@@ -2,8 +2,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
   const { user, fetchMe } = useAuth()
   const localePath = useLocalePath()
 
-  // Load session if client-side and empty
-  if (import.meta.client && !user.value) {
+  // Load session if empty
+  if (!user.value) {
     await fetchMe()
   }
 

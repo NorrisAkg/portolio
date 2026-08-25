@@ -5,16 +5,22 @@ definePageMeta({
 })
 
 const { getArticlesList } = useArticles()
+const { getProjectsList } = useProjects()
 const localePath = useLocalePath()
 
 // Fetch articles list with different statuses
 const { articles: publishedArticles, refresh: refreshPublished } = await getArticlesList({ status: 'PUBLISHED' })
 const { articles: draftArticles, refresh: refreshDrafts } = await getArticlesList({ status: 'DRAFT' })
 
+// Fetch projects list with different statuses
+const { projects: publishedProjects, refresh: refreshPublishedProjects } = await getProjectsList({ status: 'PUBLISHED' })
+const { projects: draftProjects, refresh: refreshDraftProjects } = await getProjectsList({ status: 'DRAFT' })
+
 const activeTab = ref<'articles' | 'projects'>('articles')
 const activeArticleSubTab = ref<'published' | 'drafts'>('published')
+const activeProjectSubTab = ref<'published' | 'drafts'>('published')
 
-// Deletion dialog state
+// Deletion dialog state (Articles)
 const articleToDelete = ref<{ id: string; title: string } | null>(null)
 const isDeleting = ref(false)
 
@@ -36,8 +42,8 @@ const handleDelete = async () => {
     await refreshPublished()
     await refreshDrafts()
     articleToDelete.value = null
-  } catch {
-    alert('Erreur lors de la suppression de l\'article.')
+  } catch (err: unknown) {
+    alert(formatApiError(err, 'Erreur lors de la suppression de l\'article.'))
   } finally {
     isDeleting.value = false
   }
@@ -51,19 +57,48 @@ const handlePublish = async (id: string) => {
     })
     await refreshPublished()
     await refreshDrafts()
-  } catch {
-    alert('Erreur lors de la publication de l\'article.')
+  } catch (err: unknown) {
+    alert(formatApiError(err, 'Erreur lors de la publication de l\'article.'))
   }
 }
 
-const { getProjectsList } = useProjects()
-const { projects: realProjects, refresh: refreshProjects } = await getProjectsList()
-const mockProjects = computed(() => realProjects.value.map(p => ({
-  id: p.id,
-  name: p.name,
-  year: p.year,
-  status: p.featured ? 'FEATURED' : 'ACTIVE',
-})))
+// Unpublish article action
+const handleUnpublish = async (id: string) => {
+  try {
+    await $fetch(`/api/articles/${id}/unpublish`, {
+      method: 'POST',
+    })
+    await refreshPublished()
+    await refreshDrafts()
+  } catch (err: unknown) {
+    alert(formatApiError(err, 'Erreur lors de la dépublication de l\'article.'))
+  }
+}
+
+// Project actions (Publish / Unpublish)
+const handlePublishProject = async (id: string) => {
+  try {
+    await $fetch(`/api/projects/${id}/publish`, {
+      method: 'POST',
+    })
+    await refreshPublishedProjects()
+    await refreshDraftProjects()
+  } catch (err: unknown) {
+    alert(formatApiError(err, 'Erreur lors de la publication du projet.'))
+  }
+}
+
+const handleUnpublishProject = async (id: string) => {
+  try {
+    await $fetch(`/api/projects/${id}/unpublish`, {
+      method: 'POST',
+    })
+    await refreshPublishedProjects()
+    await refreshDraftProjects()
+  } catch (err: unknown) {
+    alert(formatApiError(err, 'Erreur lors de la dépublication du projet.'))
+  }
+}
 
 // Project Deletion Dialog State
 const projectToDelete = ref<{ id: string; name: string } | null>(null)
@@ -84,10 +119,11 @@ const handleDeleteProject = async () => {
     await $fetch(`/api/projects/${projectToDelete.value.id}`, {
       method: 'DELETE',
     })
-    await refreshProjects()
+    await refreshPublishedProjects()
+    await refreshDraftProjects()
     projectToDelete.value = null
-  } catch {
-    alert('Erreur lors de la suppression du projet.')
+  } catch (err: unknown) {
+    alert(formatApiError(err, 'Erreur lors de la suppression du projet.'))
   } finally {
     isDeletingProject.value = false
   }
@@ -108,101 +144,113 @@ const handleDeleteProject = async () => {
           :to="localePath('/admin/articles/create')"
           class="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-orange text-slate-950 text-sm font-semibold hover:bg-orange/90 transition-colors"
         >
-          <span>+</span> Nouveau Blog
+          <span>+</span> Nouvel article
         </NuxtLink>
         <NuxtLink
-          v-else-if="activeTab === 'projects'"
+          v-else
           :to="localePath('/admin/projects/create')"
           class="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-orange text-slate-950 text-sm font-semibold hover:bg-orange/90 transition-colors"
         >
-          <span>+</span> Nouveau Projet
+          <span>+</span> Nouveau projet
         </NuxtLink>
       </div>
     </div>
 
-    <!-- Navigation Tabs -->
-    <div class="flex gap-2 border-b border-border p-1 bg-slate-100 dark:bg-slate-900/60 rounded-xl w-fit">
+    <!-- Main Navigation Tabs -->
+    <div class="flex border-b border-border gap-8 text-sm font-semibold">
       <button
-        class="h-9 px-4 rounded-lg text-xs font-semibold uppercase tracking-wider transition-colors"
-        :class="activeTab === 'articles' ? 'bg-white dark:bg-[#0A0F1A] text-orange shadow-sm' : 'text-muted hover:text-navy'"
+        class="pb-3 relative transition-colors flex items-center gap-2"
+        :class="activeTab === 'articles' ? 'text-orange border-b-2 border-orange' : 'text-muted hover:text-navy dark:hover:text-[#E8ECF5]'"
         @click="activeTab = 'articles'"
       >
-        Blog (Articles)
+        <span>Articles</span>
+        <span class="px-2 py-0.5 rounded-full text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+          {{ publishedArticles.length + draftArticles.length }}
+        </span>
       </button>
       <button
-        class="h-9 px-4 rounded-lg text-xs font-semibold uppercase tracking-wider transition-colors"
-        :class="activeTab === 'projects' ? 'bg-white dark:bg-[#0A0F1A] text-orange shadow-sm' : 'text-muted hover:text-navy'"
+        class="pb-3 relative transition-colors flex items-center gap-2"
+        :class="activeTab === 'projects' ? 'text-orange border-b-2 border-orange' : 'text-muted hover:text-navy dark:hover:text-[#E8ECF5]'"
         @click="activeTab = 'projects'"
       >
-        Projets (Mock)
+        <span>Projets</span>
+        <span class="px-2 py-0.5 rounded-full text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+          {{ publishedProjects.length + draftProjects.length }}
+        </span>
       </button>
     </div>
 
     <!-- ARTICLES CONTENT -->
     <div v-if="activeTab === 'articles'" class="space-y-6">
-      <!-- Subtabs: Published / Drafts -->
-      <div class="flex gap-4 items-center">
+      <!-- Sub-tabs: Published vs Drafts -->
+      <div class="flex items-center gap-3">
         <button
-          class="relative pb-2 text-xs uppercase tracking-wider font-bold transition-colors"
-          :class="activeArticleSubTab === 'published' ? 'text-orange' : 'text-muted hover:text-navy'"
+          class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-2"
+          :class="activeArticleSubTab === 'published' ? 'bg-orange/15 text-orange' : 'bg-slate-100 dark:bg-slate-900 text-muted hover:text-navy dark:hover:text-white'"
           @click="activeArticleSubTab = 'published'"
         >
-          Publiés ({{ publishedArticles.length }})
-          <span v-if="activeArticleSubTab === 'published'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-orange"></span>
+          <span>Publiés</span>
+          <span class="px-1.5 py-0.2 rounded text-[10px] bg-white/60 dark:bg-slate-800">{{ publishedArticles.length }}</span>
         </button>
         <button
-          class="relative pb-2 text-xs uppercase tracking-wider font-bold transition-colors"
-          :class="activeArticleSubTab === 'drafts' ? 'text-orange' : 'text-muted hover:text-navy'"
+          class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-2"
+          :class="activeArticleSubTab === 'drafts' ? 'bg-orange/15 text-orange' : 'bg-slate-100 dark:bg-slate-900 text-muted hover:text-navy dark:hover:text-white'"
           @click="activeArticleSubTab = 'drafts'"
         >
-          Brouillons ({{ draftArticles.length }})
-          <span v-if="activeArticleSubTab === 'drafts'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-orange"></span>
+          <span>Brouillons</span>
+          <span class="px-1.5 py-0.2 rounded text-[10px] bg-white/60 dark:bg-slate-800">{{ draftArticles.length }}</span>
         </button>
       </div>
 
-      <!-- Articles list container -->
+      <!-- Articles Table -->
       <div class="bg-white dark:bg-[#0A0F1A] border border-border rounded-2xl overflow-hidden shadow-sm">
-        <!-- Empty States -->
-        <div v-if="activeArticleSubTab === 'published' && publishedArticles.length === 0" class="p-12 text-center text-muted text-sm">
-          Aucun article publié. Créez-en un et cliquez sur "Publier".
-        </div>
-        <div v-else-if="activeArticleSubTab === 'drafts' && draftArticles.length === 0" class="p-12 text-center text-muted text-sm">
-          Aucun brouillon.
-        </div>
-
-        <!-- Table -->
-        <table v-else class="w-full text-left border-collapse">
+        <table class="w-full text-left border-collapse">
           <thead>
             <tr class="bg-slate-50 dark:bg-slate-900/40 text-xs font-['JetBrains_Mono'] tracking-wider uppercase text-muted border-b border-border">
-              <th class="p-4 pl-6">Index</th>
-              <th class="p-4">Titre</th>
-              <th class="p-4">Catégorie</th>
+              <th class="p-4 pl-6">Titre de l'article</th>
+              <th class="p-4">Tag</th>
               <th class="p-4">Date</th>
               <th class="p-4 text-right pr-6">Actions</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-border">
+            <tr v-if="(activeArticleSubTab === 'published' ? publishedArticles : draftArticles).length === 0">
+              <td colspan="4" class="p-8 text-center text-sm text-muted">
+                Aucun article dans cette section.
+              </td>
+            </tr>
             <tr
               v-for="art in (activeArticleSubTab === 'published' ? publishedArticles : draftArticles)"
               :key="art.id"
               class="text-sm hover:bg-slate-50/50 dark:hover:bg-slate-900/20 transition-colors"
             >
-              <td class="p-4 pl-6 font-['JetBrains_Mono'] text-xs text-muted">
-                #{{ String(art.idx + 1).padStart(2, '0') }}
-              </td>
-              <td class="p-4 font-semibold text-navy dark:text-[#E8ECF5]">
-                {{ art.title }}
+              <td class="p-4 pl-6 font-semibold text-navy dark:text-[#E8ECF5]">
+                <NuxtLink :to="localePath(`/blog/${art.slug}`)" target="_blank" class="hover:text-orange transition-colors inline-flex items-center gap-1.5">
+                  {{ art.title }}
+                  <span class="text-xs text-muted">↗</span>
+                </NuxtLink>
               </td>
               <td class="p-4">
-                <span class="text-xs font-bold text-orange uppercase tracking-wider">{{ art.tag }}</span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-orange/10 text-orange uppercase tracking-wider">
+                  {{ art.tag }}
+                </span>
               </td>
               <td class="p-4 text-xs text-muted">
-                {{ art.date }}
+                {{ art.date || 'Non daté' }}
               </td>
               <td class="p-4 text-right pr-6 space-x-2">
-                <!-- Publish Button (only for drafts) -->
+                <!-- Unpublish Button (for published) -->
                 <button
-                  v-if="activeArticleSubTab === 'drafts'"
+                  v-if="activeArticleSubTab === 'published'"
+                  title="Dépublier (passer en brouillon)"
+                  class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 transition-colors"
+                  @click="handleUnpublish(art.id)"
+                >
+                  🔒
+                </button>
+                <!-- Publish Button (for drafts) -->
+                <button
+                  v-else
                   title="Publier l'article"
                   class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 transition-colors"
                   @click="handlePublish(art.id)"
@@ -234,20 +282,45 @@ const handleDeleteProject = async () => {
 
     <!-- PROJECTS CONTENT -->
     <div v-if="activeTab === 'projects'" class="space-y-6">
+      <!-- Sub-tabs: Published vs Drafts -->
+      <div class="flex items-center gap-3">
+        <button
+          class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-2"
+          :class="activeProjectSubTab === 'published' ? 'bg-orange/15 text-orange' : 'bg-slate-100 dark:bg-slate-900 text-muted hover:text-navy dark:hover:text-white'"
+          @click="activeProjectSubTab = 'published'"
+        >
+          <span>Publiés</span>
+          <span class="px-1.5 py-0.2 rounded text-[10px] bg-white/60 dark:bg-slate-800">{{ publishedProjects.length }}</span>
+        </button>
+        <button
+          class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-2"
+          :class="activeProjectSubTab === 'drafts' ? 'bg-orange/15 text-orange' : 'bg-slate-100 dark:bg-slate-900 text-muted hover:text-navy dark:hover:text-white'"
+          @click="activeProjectSubTab = 'drafts'"
+        >
+          <span>Brouillons</span>
+          <span class="px-1.5 py-0.2 rounded text-[10px] bg-white/60 dark:bg-slate-800">{{ draftProjects.length }}</span>
+        </button>
+      </div>
 
+      <!-- Projects Table -->
       <div class="bg-white dark:bg-[#0A0F1A] border border-border rounded-2xl overflow-hidden shadow-sm">
         <table class="w-full text-left border-collapse">
           <thead>
             <tr class="bg-slate-50 dark:bg-slate-900/40 text-xs font-['JetBrains_Mono'] tracking-wider uppercase text-muted border-b border-border">
               <th class="p-4 pl-6">Nom du Projet</th>
               <th class="p-4">Année</th>
-              <th class="p-4">Statut</th>
+              <th class="p-4">Mise en avant</th>
               <th class="p-4 text-right pr-6">Actions</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-border">
+            <tr v-if="(activeProjectSubTab === 'published' ? publishedProjects : draftProjects).length === 0">
+              <td colspan="4" class="p-8 text-center text-sm text-muted">
+                Aucun projet dans cette section.
+              </td>
+            </tr>
             <tr
-              v-for="p in mockProjects"
+              v-for="p in (activeProjectSubTab === 'published' ? publishedProjects : draftProjects)"
               :key="p.id"
               class="text-sm hover:bg-slate-50/50 dark:hover:bg-slate-900/20 transition-colors"
             >
@@ -255,18 +328,50 @@ const handleDeleteProject = async () => {
                 {{ p.name }}
               </td>
               <td class="p-4 text-xs text-muted">
-                {{ p.year }}
+                {{ p.year }} · {{ p.dur }}
               </td>
               <td class="p-4">
                 <span
-                  class="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider"
-                  :class="p.status === 'FEATURED' ? 'bg-orange/10 text-orange' : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'"
+                  v-if="p.featured"
+                  class="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider bg-orange/10 text-orange"
                 >
-                  {{ p.status }}
+                  FEATURED
+                </span>
+                <span
+                  v-else
+                  class="text-[10px] font-medium px-2 py-0.5 rounded uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-muted"
+                >
+                  STANDARD
                 </span>
               </td>
               <td class="p-4 text-right pr-6 space-x-2">
-                <button disabled class="opacity-30 inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-500/10 text-slate-500 cursor-not-allowed">✏️</button>
+                <!-- Unpublish Button (for published) -->
+                <button
+                  v-if="activeProjectSubTab === 'published'"
+                  title="Dépublier (passer en brouillon)"
+                  class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 transition-colors"
+                  @click="handleUnpublishProject(p.id)"
+                >
+                  🔒
+                </button>
+                <!-- Publish Button (for drafts) -->
+                <button
+                  v-else
+                  title="Publier le projet"
+                  class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 transition-colors"
+                  @click="handlePublishProject(p.id)"
+                >
+                  🌐
+                </button>
+                <!-- Edit Button -->
+                <NuxtLink
+                  :to="localePath(`/admin/projects/${p.id}`)"
+                  title="Modifier"
+                  class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 transition-colors"
+                >
+                  ✏️
+                </NuxtLink>
+                <!-- Delete Button -->
                 <button
                   title="Supprimer"
                   class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 transition-colors"

@@ -87,8 +87,8 @@ const handleSave = async () => {
     })
 
     router.push(localePath('/admin'))
-  } catch (err: any) {
-    errorMsg.value = err.data?.statusMessage || err.message || 'Une erreur est survenue lors de la création de l\'article'
+  } catch (err: unknown) {
+    errorMsg.value = formatApiError(err, 'Une erreur est survenue lors de la création de l\'article')
   } finally {
     loading.value = false
   }
@@ -117,16 +117,11 @@ const handleSave = async () => {
       <!-- General settings -->
       <div class="bg-white dark:bg-[#0A0F1A] border border-border p-6 rounded-2xl shadow-sm space-y-4">
         <h2 class="font-['Montserrat'] font-bold text-base text-navy dark:text-white m-0">Paramètres généraux</h2>
-        <div class="flex flex-col gap-1.5">
-          <label for="image" class="text-xs tracking-wider uppercase text-muted font-medium">URL de l'image de couverture</label>
-          <input
-            id="image"
-            v-model="image"
-            type="url"
-            placeholder="https://images.unsplash.com/photo-..."
-            class="h-10 px-3 bg-slate-50 dark:bg-slate-900 border border-border rounded-lg text-sm text-navy dark:text-[#E8ECF5] focus:outline-none focus:border-orange transition-colors"
-          />
-        </div>
+        <AdminImageUpload
+          v-model="image"
+          label="Image de couverture"
+          placeholder="https://images.unsplash.com/... ou /uploads/..."
+        />
       </div>
 
       <!-- Translations settings tab -->

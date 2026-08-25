@@ -108,10 +108,33 @@ const handleSave = async () => {
     })
 
     router.push(localePath('/admin'))
-  } catch (err: any) {
-    errorMsg.value = err.data?.statusMessage || err.message || 'Une erreur est survenue lors de la mise à jour'
+  } catch (err: unknown) {
+    errorMsg.value = formatApiError(err, 'Une erreur est survenue lors de la mise à jour')
   } finally {
     loading.value = false
+  }
+}
+
+const currentStatus = ref(rawArticle.value?.status || 'DRAFT')
+const isTogglingStatus = ref(false)
+
+const handleTogglePublish = async () => {
+  const articleId = rawArticle.value?.id
+  if (!articleId) return
+
+  isTogglingStatus.value = true
+  try {
+    if (currentStatus.value === 'PUBLISHED') {
+      await $fetch(`/api/articles/${articleId}/unpublish`, { method: 'POST' })
+      currentStatus.value = 'DRAFT'
+    } else {
+      await $fetch(`/api/articles/${articleId}/publish`, { method: 'POST' })
+      currentStatus.value = 'PUBLISHED'
+    }
+  } catch (err: unknown) {
+    errorMsg.value = formatApiError(err, 'Erreur lors du changement de statut')
+  } finally {
+    isTogglingStatus.value = false
   }
 }
 </script>
@@ -119,13 +142,37 @@ const handleSave = async () => {
 <template>
   <div class="space-y-8 max-w-4xl mx-auto">
     <!-- Breadcrumb & Title -->
-    <div class="space-y-2 border-b border-border pb-5">
-      <nav class="flex items-center gap-2 font-['JetBrains_Mono'] text-[10px] tracking-[0.1em] uppercase text-muted" aria-label="breadcrumb">
-        <NuxtLink :to="localePath('/admin')" class="hover:text-orange transition-colors">Dashboard</NuxtLink>
-        <span class="text-border">/</span>
-        <span class="text-navy dark:text-white">Modifier l'article</span>
-      </nav>
-      <h1 class="font-['Montserrat'] font-bold text-3xl tracking-tight text-navy dark:text-white m-0">Modifier l'article</h1>
+    <div class="flex items-center justify-between border-b border-border pb-5">
+      <div class="space-y-2">
+        <nav class="flex items-center gap-2 font-['JetBrains_Mono'] text-[10px] tracking-[0.1em] uppercase text-muted" aria-label="breadcrumb">
+          <NuxtLink :to="localePath('/admin')" class="hover:text-orange transition-colors">Dashboard</NuxtLink>
+          <span class="text-border">/</span>
+          <span class="text-navy dark:text-white">Modifier l'article</span>
+        </nav>
+        <div class="flex items-center gap-3">
+          <h1 class="font-['Montserrat'] font-bold text-3xl tracking-tight text-navy dark:text-white m-0">Modifier l'article</h1>
+          <span
+            class="text-[10px] font-bold px-2.5 py-1 rounded uppercase tracking-wider"
+            :class="currentStatus === 'PUBLISHED' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'"
+          >
+            {{ currentStatus === 'PUBLISHED' ? 'Publié' : 'Brouillon' }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Quick toggle status button -->
+      <button
+        type="button"
+        :disabled="isTogglingStatus"
+        class="h-9 px-4 rounded-lg text-xs font-semibold flex items-center gap-2 transition-all border"
+        :class="currentStatus === 'PUBLISHED'
+          ? 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30'
+          : 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'"
+        @click="handleTogglePublish"
+      >
+        <span v-if="isTogglingStatus" class="animate-spin rounded-full h-3.5 w-3.5 border-2 border-current border-t-transparent"></span>
+        <span>{{ currentStatus === 'PUBLISHED' ? '🔒 Dépublier (Passer en brouillon)' : '🌐 Publier l\'article' }}</span>
+      </button>
     </div>
 
     <!-- Main Form -->
@@ -138,16 +185,11 @@ const handleSave = async () => {
       <!-- General settings -->
       <div class="bg-white dark:bg-[#0A0F1A] border border-border p-6 rounded-2xl shadow-sm space-y-4">
         <h2 class="font-['Montserrat'] font-bold text-base text-navy dark:text-white m-0">Paramètres généraux</h2>
-        <div class="flex flex-col gap-1.5">
-          <label for="image" class="text-xs tracking-wider uppercase text-muted font-medium">URL de l'image de couverture</label>
-          <input
-            id="image"
-            v-model="image"
-            type="url"
-            placeholder="https://images.unsplash.com/photo-..."
-            class="h-10 px-3 bg-slate-50 dark:bg-slate-900 border border-border rounded-lg text-sm text-navy dark:text-[#E8ECF5] focus:outline-none focus:border-orange transition-colors"
-          />
-        </div>
+        <AdminImageUpload
+          v-model="image"
+          label="Image de couverture"
+          placeholder="https://images.unsplash.com/... ou /uploads/..."
+        />
       </div>
 
       <!-- Translations settings tab -->

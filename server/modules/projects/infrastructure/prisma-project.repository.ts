@@ -32,10 +32,13 @@ export class PrismaProjectRepository implements ProjectRepository {
   }
 
   async findAll(params: FindAllProjectsParams): Promise<Project[]> {
-    const { featured } = params;
+    const { featured, status } = params;
     const where: Prisma.ProjectWhereInput = {};
     if (featured !== undefined) {
       where.featured = featured;
+    }
+    if (status && status !== 'ALL') {
+      where.status = status;
     }
 
     const prismaProjects = await this.prisma.project.findMany({
@@ -66,6 +69,8 @@ export class PrismaProjectRepository implements ProjectRepository {
         githubUrl: props.githubUrl,
         liveUrl: props.liveUrl,
         featured: props.featured,
+        status: props.status,
+        publishedAt: props.publishedAt,
         updatedAt: new Date(),
         translations: {
           upsert: props.translations.map(t => ({
@@ -105,6 +110,8 @@ export class PrismaProjectRepository implements ProjectRepository {
         githubUrl: props.githubUrl,
         liveUrl: props.liveUrl,
         featured: props.featured,
+        status: props.status,
+        publishedAt: props.publishedAt,
         createdAt: props.createdAt,
         updatedAt: props.updatedAt,
         translations: {

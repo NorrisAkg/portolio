@@ -2,6 +2,7 @@ import type { Project } from './project.entity';
 
 export interface FindAllProjectsParams {
   featured?: boolean;
+  status?: 'DRAFT' | 'PUBLISHED' | 'ALL';
 }
 
 export interface ProjectRepository {

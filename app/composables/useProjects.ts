@@ -31,10 +31,12 @@ export const useProjects = () => {
       liveUrl: p.liveUrl,
       slug: trans.slug,
       featured: p.featured,
+      status: p.status || 'DRAFT',
+      publishedAt: p.publishedAt,
     }
   }
 
-  const getProjectsList = async (options: { featured?: boolean } = {}) => {
+  const getProjectsList = async (options: { featured?: boolean; status?: 'PUBLISHED' | 'DRAFT' | 'ALL' } = {}) => {
     const { data, error, pending, refresh } = await useFetch<ProjectProps[]>('/api/projects', {
       query: options,
     })

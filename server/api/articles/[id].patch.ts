@@ -34,9 +34,6 @@ export default defineEventHandler(async (event) => {
 
     return article.toJSON();
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      throw createError({ statusCode: 400, statusMessage: 'Bad Request', data: error.issues });
-    }
-    handleDomainError(error);
+    handleDomainError(error, event);
   }
 });

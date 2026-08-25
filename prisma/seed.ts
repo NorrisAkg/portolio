@@ -129,6 +129,8 @@ async function main() {
       year: '2025',
       dur: '8w',
       featured: true,
+      status: 'PUBLISHED',
+      publishedAt: new Date(),
       technologies: {
         connect: [{ id: techNuxt.id }, { id: techNest.id }, { id: techPg.id }, { id: techStripe.id }]
       },
@@ -169,6 +171,8 @@ async function main() {
       year: '2024',
       dur: '5w',
       featured: true,
+      status: 'PUBLISHED',
+      publishedAt: new Date(),
       technologies: {
         connect: [{ id: techReact.id }, { id: techNest.id }, { id: techFirebase.id }]
       },
@@ -209,6 +213,8 @@ async function main() {
       year: '2025',
       dur: '12w',
       featured: true,
+      status: 'PUBLISHED',
+      publishedAt: new Date(),
       technologies: {
         connect: [{ id: techSolidity.id }, { id: techNuxt.id }, { id: techEthers.id }, { id: techPolygon.id }]
       },
@@ -249,6 +255,8 @@ async function main() {
       year: '2024',
       dur: '6w',
       featured: false,
+      status: 'PUBLISHED',
+      publishedAt: new Date(),
       technologies: {
         connect: [{ id: techNuxt.id }, { id: techNest.id }, { id: techPg.id }]
       },
@@ -289,6 +297,8 @@ async function main() {
       year: '2023',
       dur: '10w',
       featured: false,
+      status: 'PUBLISHED',
+      publishedAt: new Date(),
       technologies: {
         connect: [{ id: techReact.id }, { id: techNest.id }, { id: techMapbox.id }]
       },
@@ -329,6 +339,8 @@ async function main() {
       year: '2023',
       dur: '4w',
       featured: false,
+      status: 'PUBLISHED',
+      publishedAt: new Date(),
       technologies: {
         connect: [{ id: techNest.id }, { id: techTimescale.id }, { id: techGrafana.id }]
       },

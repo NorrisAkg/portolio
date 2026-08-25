@@ -46,6 +46,12 @@ export default defineEventHandler(async (event) => {
       maxAge: 60 * 60 * 24 * 7, // 1 week
     });
 
+    logger.info(`[Auth] Connexion réussie pour l'utilisateur: ${user.email}`, {
+      path: event.path,
+      method: event.method,
+      userId: user.id,
+    });
+
     return {
       user: {
         id: user.id,
@@ -53,13 +59,6 @@ export default defineEventHandler(async (event) => {
       },
     };
   } catch (error: any) {
-    if (error instanceof z.ZodError) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Bad Request',
-        data: error.issues,
-      });
-    }
-    throw error;
+    return handleDomainError(error, event);
   }
 });

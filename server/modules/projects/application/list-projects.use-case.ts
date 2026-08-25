@@ -3,6 +3,7 @@ import type { Project } from '../domain/project.entity';
 
 export interface ListProjectsInput {
   featured?: boolean;
+  status?: 'DRAFT' | 'PUBLISHED' | 'ALL';
 }
 
 export class ListProjectsUseCase {

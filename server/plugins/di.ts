@@ -5,6 +5,7 @@ import { ListArticlesUseCase } from '../modules/articles/application/list-articl
 import { GetArticleUseCase } from '../modules/articles/application/get-article.use-case';
 import { CreateArticleUseCase } from '../modules/articles/application/create-article.use-case';
 import { PublishArticleUseCase } from '../modules/articles/application/publish-article.use-case';
+import { UnpublishArticleUseCase } from '../modules/articles/application/unpublish-article.use-case';
 import { UpdateArticleUseCase } from '../modules/articles/application/update-article.use-case';
 import { DeleteArticleUseCase } from '../modules/articles/application/delete-article.use-case';
 
@@ -12,6 +13,9 @@ import { PrismaProjectRepository } from '../modules/projects/infrastructure/pris
 import { ListProjectsUseCase } from '../modules/projects/application/list-projects.use-case';
 import { GetProjectUseCase } from '../modules/projects/application/get-project.use-case';
 import { CreateProjectUseCase } from '../modules/projects/application/create-project.use-case';
+import { UpdateProjectUseCase } from '../modules/projects/application/update-project.use-case';
+import { PublishProjectUseCase } from '../modules/projects/application/publish-project.use-case';
+import { UnpublishProjectUseCase } from '../modules/projects/application/unpublish-project.use-case';
 import { DeleteProjectUseCase } from '../modules/projects/application/delete-project.use-case';
 
 export default defineNitroPlugin(() => {
@@ -22,17 +26,22 @@ export default defineNitroPlugin(() => {
   const projectRepository = new PrismaProjectRepository(prisma);
   container.register('ProjectRepository', projectRepository);
 
-  // Use Cases
+  // Use Cases - Articles
   container.register('ListArticlesUseCase', new ListArticlesUseCase(articleRepository));
   container.register('GetArticleUseCase', new GetArticleUseCase(articleRepository));
   container.register('CreateArticleUseCase', new CreateArticleUseCase(articleRepository));
   container.register('PublishArticleUseCase', new PublishArticleUseCase(articleRepository));
+  container.register('UnpublishArticleUseCase', new UnpublishArticleUseCase(articleRepository));
   container.register('UpdateArticleUseCase', new UpdateArticleUseCase(articleRepository));
   container.register('DeleteArticleUseCase', new DeleteArticleUseCase(articleRepository));
 
+  // Use Cases - Projects
   container.register('ListProjectsUseCase', new ListProjectsUseCase(projectRepository));
   container.register('GetProjectUseCase', new GetProjectUseCase(projectRepository));
   container.register('CreateProjectUseCase', new CreateProjectUseCase(projectRepository));
+  container.register('UpdateProjectUseCase', new UpdateProjectUseCase(projectRepository));
+  container.register('PublishProjectUseCase', new PublishProjectUseCase(projectRepository));
+  container.register('UnpublishProjectUseCase', new UnpublishProjectUseCase(projectRepository));
   container.register('DeleteProjectUseCase', new DeleteProjectUseCase(projectRepository));
 
   console.log('[DI] Dependencies registered.');

@@ -49,6 +49,11 @@ export class Article {
     this.props.updatedAt = new Date();
   }
 
+  public unpublish(): void {
+    this.props.status = 'DRAFT';
+    this.props.updatedAt = new Date();
+  }
+
   public update(data: Partial<Pick<ArticleProps, 'image'>> & { translations?: ArticleTranslationProps[] }): void {
     this.props = {
       ...this.props,

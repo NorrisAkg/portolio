@@ -19,9 +19,6 @@ export default defineEventHandler(async (event) => {
     setResponseStatus(event, 204);
     return null;
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      throw createError({ statusCode: 400, statusMessage: 'Bad Request', data: error.issues });
-    }
-    handleDomainError(error);
+    handleDomainError(error, event);
   }
 });

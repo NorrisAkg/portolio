@@ -30,6 +30,8 @@ export class CreateProjectUseCase {
       githubUrl: input.githubUrl ?? null,
       liveUrl: input.liveUrl ?? null,
       featured: input.featured ?? false,
+      status: 'DRAFT',
+      publishedAt: null,
       createdAt: now,
       updatedAt: now,
       translations: input.translations,

@@ -19,14 +19,35 @@ const innerBg = computed(() => props.tone === 'navy' ? '#0F1626' : '#fff')
 const innerStroke = computed(() => props.tone === 'navy' ? '#1E2638' : '#E5E7EB')
 const barFill = computed(() => props.tone === 'navy' ? '#8A93A6' : '#6B7280')
 const blockBg = computed(() => props.tone === 'navy' ? '#1E2638' : '#F7F8FA')
+const isDirectImage = computed(() => {
+  if (!props.label) return false
+  return (
+    props.label.startsWith('/uploads/') ||
+    props.label.startsWith('http://') ||
+    props.label.startsWith('https://') ||
+    props.label.startsWith('data:')
+  )
+})
 </script>
 
 <template>
   <div
-    class="aspect-[4/3] rounded-[14px] overflow-hidden border border-border relative"
+    class="aspect-[4/3] rounded-[14px] overflow-hidden border border-border relative flex items-center justify-center"
     :style="{ background: bg }"
   >
-    <svg viewBox="0 0 400 300" preserveAspectRatio="none" width="100%" height="100%">
+    <img
+      v-if="isDirectImage"
+      :src="label"
+      :alt="label"
+      class="w-full h-full object-cover"
+    />
+    <svg
+      v-else
+      viewBox="0 0 400 300"
+      preserveAspectRatio="none"
+      width="100%"
+      height="100%"
+    >
       <defs>
         <pattern
           :id="patternId"
@@ -50,6 +71,6 @@ const blockBg = computed(() => props.tone === 'navy' ? '#1E2638' : '#F7F8FA')
       <rect x="222" y="200" width="46" height="6" rx="2" :fill="accent" />
       <rect x="222" y="214" width="80" height="5" rx="2" :fill="stripe" opacity=".4" />
     </svg>
-    <span class="absolute left-3.5 bottom-3 font-['JetBrains_Mono'] text-[10px] text-muted uppercase tracking-[0.1em]">{{ label }}</span>
+    <span v-if="!isDirectImage && label" class="absolute left-3.5 bottom-3 font-['JetBrains_Mono'] text-[10px] text-muted uppercase tracking-[0.1em]">{{ label }}</span>
   </div>
 </template>

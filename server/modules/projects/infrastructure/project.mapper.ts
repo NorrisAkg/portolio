@@ -18,6 +18,8 @@ export class ProjectMapper {
       githubUrl: prismaProject.githubUrl,
       liveUrl: prismaProject.liveUrl,
       featured: prismaProject.featured,
+      status: (prismaProject.status as 'DRAFT' | 'PUBLISHED') || 'DRAFT',
+      publishedAt: prismaProject.publishedAt,
       createdAt: prismaProject.createdAt,
       updatedAt: prismaProject.updatedAt,
       translations: prismaProject.translations.map(t => ({
@@ -49,6 +51,8 @@ export class ProjectMapper {
       githubUrl: props.githubUrl,
       liveUrl: props.liveUrl,
       featured: props.featured,
+      status: props.status,
+      publishedAt: props.publishedAt,
       createdAt: props.createdAt,
       updatedAt: props.updatedAt,
     };

@@ -15,6 +15,8 @@ model User {
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@map("users")
 }
 
 model Article {
@@ -27,6 +29,8 @@ model Article {
 
   tags         Tag[]
   translations ArticleTranslation[]
+
+  @@map("articles")
 }
 
 model ArticleTranslation {
@@ -34,29 +38,35 @@ model ArticleTranslation {
   articleId   String
   locale      String   // "fr" ou "en"
   title       String
-  slug        String   @unique
+  slug        String
   description String
   content     String
 
   article     Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
 
   @@unique([articleId, locale])
+  @@unique([locale, slug])
+  @@map("article_translations")
 }
 
 model Project {
-  id          String   @id @default(uuid())
-  image       String?  // Name of the cover image file (labeled "label" on frontend)
-  tone        String   @default("cool") // "warm", "cool", "navy"
+  id          String    @id @default(uuid())
+  image       String?   // Name of the cover image file (labeled "label" on frontend)
+  tone        String    @default("cool") // "warm", "cool", "navy"
   year        String
   dur         String
   githubUrl   String?
   liveUrl     String?
-  featured    Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  featured    Boolean   @default(false)
+  status      String    @default("DRAFT") // DRAFT, PUBLISHED
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   technologies Technology[]
   translations ProjectTranslation[]
+
+  @@map("projects")
 }
 
 model ProjectTranslation {
@@ -64,7 +74,7 @@ model ProjectTranslation {
   projectId     String
   locale        String   // "fr" or "en"
   title         String   // Mapped to project name
-  slug          String   @unique
+  slug          String
   description   String   // Mapped to project "problem"
   content       String   // Project details/writeup
   outcome       String   // Business outcome (e.g. "+38% average margin")
@@ -73,6 +83,8 @@ model ProjectTranslation {
   project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@unique([projectId, locale])
+  @@unique([locale, slug])
+  @@map("project_translations")
 }
 
 model Tag {
@@ -83,6 +95,8 @@ model Tag {
   updatedAt DateTime @updatedAt
 
   articles Article[]
+
+  @@map("tags")
 }
 
 model Technology {
@@ -94,4 +108,6 @@ model Technology {
   updatedAt DateTime @updatedAt
 
   projects Project[]
+
+  @@map("technologies")
 }

@@ -1,7 +1,13 @@
 <script setup lang="ts">
-const { user, logout } = useAuth()
+const { user, logout, fetchMe } = useAuth()
 const localePath = useLocalePath()
 const router = useRouter()
+
+onMounted(async () => {
+  if (!user.value) {
+    await fetchMe()
+  }
+})
 
 const colorMode = useColorMode()
 const isDark = computed(() => colorMode.value === 'dark')
@@ -53,11 +59,11 @@ const handleLogout = async () => {
 
         <!-- Logout -->
         <button
-          v-if="user"
-          class="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-orange/10 hover:bg-orange/20 text-orange text-xs font-medium transition-colors"
+          class="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-orange/10 hover:bg-orange/20 text-orange text-xs font-semibold transition-colors cursor-pointer"
+          title="Se déconnecter de l'espace administration"
           @click="handleLogout"
         >
-          Déconnexion
+          <span>Déconnexion</span>
         </button>
       </div>
     </header>
@@ -70,7 +76,3 @@ const handleLogout = async () => {
     </div>
   </div>
 </template>
-
-<style scoped>
-/* Scoped styles if needed */
-</style>
